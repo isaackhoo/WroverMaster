@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "WroverMaster",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"functional": "cpp",
+			"sstream": "cpp"
+		}
+	}
+}
