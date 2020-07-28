@@ -1,8 +1,8 @@
 #include "../include/common.h"
+#include "./Status/Status.h"
 #include "./Helpers/Local/LocalHelper.h"
-#include "./Network/Wifi/WifiNetwork.h"
-
-int counter = 0;
+#include "./WCS/WCS.h"
+#include "./Slave/Slave.h"
 
 using namespace Logger;
 
@@ -10,22 +10,18 @@ void setup()
 {
   bool initializationRes = false;
 
-  // initialise logger
+  // initialize logger
   initializationRes = initLogger();
 
-  // connect to wifi
-  if (!ConnectWifi())
-  {
-    info("Failed to connect to wifi");
-  };
+  // initialize WCS - connect to wifi and to server
+  initializationRes = wcs->init();
+
+  // initialize Slave - start serial to slave chip
+  initializationRes = slave->init(&Serial);
 
   if (!initializationRes)
-  {
     while (true)
-    {
-      // do nothing
-    };
-  }
+      ;
 }
 
 void loop()
@@ -35,16 +31,7 @@ void loop()
   if (isWifiConnected())
   {
     Logger::run();
-
-    ++counter;
-
-    logWCS(String(counter));
-    logWCSError(String(counter));
-    logMaster(String(counter));
-    logMasterError(String(counter));
-    logSlave(String(counter));
-    logSlaveError(String(counter));
-    
-    delay(100);
+    wcs->run();
+    slave->run();
   }
 }

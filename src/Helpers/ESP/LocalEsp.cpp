@@ -5,5 +5,7 @@ void resetChip()
     // terminate tcp
     TcpClose();
     // logToSd();
-    ESP.restart();
+    // ESP.restart();
+    while (true)
+        ;
 };

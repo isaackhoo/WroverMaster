@@ -11,13 +11,13 @@
 // -------------------------
 // Status Private Variables
 // -------------------------
-static const int DEFAULT_ID_LENGTH = 4;
-static const char *DEFAULT_ID = "-1-1";
+extern const int DEFAULT_ID_LENGTH;
+extern const char *DEFAULT_ID;
 
-static const int DEFAULT_LEVEL_MIN = 1;
-static const int DEFAULT_LEVEL_MAX = 21;
-static const char *DEFAULT_LEVEL = "02";
-static const char DEFAULT_STATUS_DELIMITER = ',';
+extern const int DEFAULT_LEVEL_MIN;
+extern const int DEFAULT_LEVEL_MAX;
+extern const char *DEFAULT_LEVEL;
+extern const char DEFAULT_STATUS_DELIMITER;
 
 // -------------------------
 // Status Public Variables
@@ -54,12 +54,14 @@ public:
     Status();
     ~Status();
     bool setId(String);
-    bool setActionEnum(String);
-    bool setInstructions(String);
     bool setLevel(String);
-    bool setPos(String);
     bool setState(ENUM_SHUTTLE_STATE, bool);
     bool setState(ENUM_SHUTTLE_STATE);
+    bool setActionEnum(String);
+    void clearActionEnum();
+    bool setInstructions(String);
+    void clearInstructions();
+    bool setPos(String);
     bool setActivityState();
     bool setIsCarryingBin(bool);
 
@@ -69,16 +71,16 @@ public:
     void saveStatus();
 
     String getId();
-    String getActionEnum();
-    String getInstructions();
     String getLevel();
-    String getPos();
     ENUM_SHUTTLE_STATE getState();
     String getStringState();
+    String getActionEnum();
+    String getInstructions();
+    String getPos();
     bool getIsCarryingBin();
-    
+
     bool isIdDefault();
 };
-extern Status status;
+extern Status *status;
 
 #endif

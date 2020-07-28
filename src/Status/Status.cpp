@@ -1,9 +1,20 @@
 #include "./Status.h"
 
 // -------------------------
+// Status Private Variables
+// -------------------------
+const int DEFAULT_ID_LENGTH = 4;
+const char *DEFAULT_ID = "-1-1";
+
+const int DEFAULT_LEVEL_MIN = 1;
+const int DEFAULT_LEVEL_MAX = 21;
+const char *DEFAULT_LEVEL = "02";
+const char DEFAULT_STATUS_DELIMITER = ',';
+
+// -------------------------
 // Status Public Variables
 // -------------------------
-Status status;
+Status *status = new Status();
 
 // -------------------------
 // Status Public Methods
@@ -33,6 +44,11 @@ bool Status::setActionEnum(String actionEnum)
     return true;
 };
 
+void Status::clearActionEnum()
+{
+    this->actionEnum = "";
+}
+
 bool Status::setInstructions(String inst)
 {
     if (inst.length() <= 0)
@@ -40,6 +56,11 @@ bool Status::setInstructions(String inst)
     this->instructions = inst;
     return true;
 };
+
+void Status::clearInstructions()
+{
+    this->instructions = "";
+}
 
 bool Status::setLevel(String level)
 {
@@ -71,11 +92,12 @@ bool Status::setState(ENUM_SHUTTLE_STATE currentState, bool log)
             logMasterToSd(logStr);
         }
     }
+    return true;
 };
 
 bool Status::setState(ENUM_SHUTTLE_STATE currentState)
 {
-    this->setState(currentState, true);
+    return this->setState(currentState, true);
 };
 
 bool Status::setActivityState()
@@ -101,7 +123,7 @@ bool Status::setActivityState()
     default:
         break;
     }
-    this->setState(activityState);
+    return this->setState(activityState);
 };
 
 bool Status::setIsCarryingBin(bool isCarryingBin)
@@ -114,9 +136,14 @@ bool Status::setIsCarryingBin(bool isCarryingBin)
 
 bool Status::setDefault()
 {
-    this->setId(DEFAULT_ID);
-    this->setLevel(DEFAULT_LEVEL);
-    this->setState(ENUM_SHUTTLE_STATE::IDLE);
+    bool res = true;
+    if (res)
+        res = this->setId(DEFAULT_ID);
+    if (res)
+        res = this->setLevel(DEFAULT_LEVEL);
+    if (res)
+        res = this->setState(ENUM_SHUTTLE_STATE::IDLE);
+    return res;
 };
 
 bool Status::setWcsInputs(String actionEnum, String inst)
@@ -133,17 +160,25 @@ bool Status::rehydrateStatus()
     if (rehydrator.length() <= 0)
         return false;
 
-    int extractionPos = 0;
+    bool res = false;
+    int extractionCase = 0;
     int delimiterIndex = 0;
     int lastExtractionPos = 0;
 
     delimiterIndex = rehydrator.indexOf(DEFAULT_STATUS_DELIMITER, lastExtractionPos);
+    if (delimiterIndex == -1)
+    {
+        // no delimiter found
+        return res;
+    }
 
-    while (delimiterIndex >= 0)
+    // process tokens
+    while (lastExtractionPos < rehydrator.length())
     {
         // extract information
         String token = rehydrator.substring(lastExtractionPos, delimiterIndex);
-        switch (extractionPos)
+
+        switch (extractionCase)
         {
         case 0:
         {
@@ -166,22 +201,39 @@ bool Status::rehydrateStatus()
             String log = "Rehydrated Shuttle State to ";
             log += SHUTTLE_STATE_STRING[this->getState()];
             Logger::info(log);
+            res = true; // last extraction completed. May not contain action and instructions
+            break;
+        }
+        case 3:
+        {
+            // action enum
+            this->setActionEnum(token);
+            Logger::info("Rehydrated actionEnum " + token);
+            res = false; // there should be instructions if action exists
+            break;
+        }
+        case 4:
+        {
+            // instructions
+            this->setInstructions(token);
+            Logger::info("Rehydrated instructions " + token);
+            res = true; // last extraction completed
             break;
         }
         default:
             break;
         }
 
-        // increment extraction pos
-        ++extractionPos;
-        // update delimiter pos
-        if (delimiterIndex + 1 <= rehydrator.length())
-        {
-            lastExtractionPos = delimiterIndex + 1;
-        }
+        // increment extraction case
+        ++extractionCase;
+        // update next token search starting position
+        lastExtractionPos = delimiterIndex + 1;
         // search for next delimiter position
         delimiterIndex = rehydrator.indexOf(DEFAULT_STATUS_DELIMITER, lastExtractionPos);
+        if (delimiterIndex == -1)
+            delimiterIndex = rehydrator.length();
     }
+    return res;
 };
 
 void Status::saveStatus()
@@ -192,6 +244,13 @@ void Status::saveStatus()
     statusString += this->getLevel();
     statusString += DEFAULT_STATUS_DELIMITER;
     statusString += GET_TWO_DIGIT_STRING(this->getState());
+    if (this->getActionEnum() != "")
+    {
+        statusString += DEFAULT_STATUS_DELIMITER;
+        statusString += this->getActionEnum();
+        statusString += DEFAULT_STATUS_DELIMITER;
+        statusString += this->getInstructions();
+    }
 
     logStatus(statusString);
 };

@@ -4,28 +4,27 @@
 #define WCS_H
 
 #include "../include/common.h"
+#include "../include/controlCharacters.h"
+#include "./Status/Status.h"
 #include "./Logger/Logger.h"
 #include "./Logger/SD/SD.h"
 #include "./Network/TCP/TCP.h"
 #include "./Network/Wifi/WifiNetwork.h"
-#include "./Status/Status.h"
 #include "./Helpers/Local/LocalHelper.h"
 #include "./Helpers/ESP/LocalEsp.h"
+#include "./Echo/Echo.h"
+
 
 using namespace Logger;
 
 // --------------------------
 // WCS Private Variables
 // --------------------------
-static const char *SOH = "\x01";
-static const char *STX = "\x02";
-static const char *ETX = "\x03";
-static const char *EOT = "\x04";
+extern const unsigned long PING_INTERVAL;
+extern const unsigned long PING_DROPPED_INTERVAL;
+extern const unsigned int MAX_DROPPED_PINGS;
 
-static const unsigned long PING_INTERVAL = 1000 * 30;         // 30s
-static const unsigned long PING_DROPPED_INTERVAL = 1000 * 35; // 35s
-
-static const unsigned long ECHO_TIMEOUT_DURATION = 1000 * 5; // 5s
+extern const unsigned long ECHO_TIMEOUT_DURATION;
 
 enum ENUM_WCS_ACTIONS
 {
@@ -47,19 +46,20 @@ enum ENUM_WCS_ACTIONS
 
 enum ENUM_MANUAL_SET_TYPES
 {
-    SET_DEFAULT = 0,
-    SET_ID,    // 01
-    SET_LEVEL, // 02
-    SET_STATE, // 03
-    SET_ECHO,  // 04
+    MANUAL_SET_DEFAULT = 0,
+    MANUAL_SET_ID,    // 01
+    MANUAL_SET_LEVEL, // 02
+    MANUAL_SET_STATE, // 03
+    MANUAL_SET_ECHO,  // 04
     Num_Of_Manual_Set_Types_Enums
 };
 
 const int DEFAULT_ENUM_VALUE_LENGTH = 2;
 
-struct WcsCommsFormat {
-    String id; // shuttle 4 digit ID
-    String actionEnum; // 2 digit action enum
+struct WcsCommsFormat
+{
+    String id;           // shuttle 4 digit ID
+    String actionEnum;   // 2 digit action enum
     String instructions; // variable length string
 };
 
@@ -73,18 +73,38 @@ struct WcsCommsFormat {
 class WCS
 {
 private:
+    Echo *echos;
+    SenderFunction bindedSender;
+
+    bool pong;
+    bool pongChecked;
+    unsigned int lastPingMillis;
+    unsigned int droppedPings;
+
+    String createSendString(WcsCommsFormat);
+    String createSendString(WcsCommsFormat, bool);
+    bool send(String, bool, bool);
     bool send(WcsCommsFormat, bool, bool);
     bool send(WcsCommsFormat, bool);
     bool send(WcsCommsFormat);
 
+    void pingServer();
+    void runPing();
+    void startPings();
+
+    WcsCommsFormat *interpret(String);
+    void updatePingReceived();
+    void perform(WcsCommsFormat *);
+    void handleTcpInput();
+
 public:
     WCS();
-    void init();
+    bool init();
     void run();
     bool updateStateChange();
 };
 
 // export only a single instance of WCS
-extern WCS wcs;
+extern WCS *wcs;
 
 #endif

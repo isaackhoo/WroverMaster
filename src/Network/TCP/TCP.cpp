@@ -20,9 +20,8 @@ bool TcpRead()
 {
     if (client.available())
     {
-        // does not cause heap fragmentation. tested
-        tcpIn = client.readString();
-        tcpIn.trim();
+        // tcp buffer has data. Read data
+        tcpIn += client.readString();
         return true;
     }
     return false;
@@ -40,7 +39,7 @@ bool TcpWrite(const char *toWrite)
 
 bool TcpWrite(String str)
 {
-    TcpWrite(str.c_str());
+    return TcpWrite(str.c_str());
 };
 
 bool TcpClose()
