@@ -6,3 +6,6 @@
 
 #Keys
 /src/Network/NetworkKeys.cpp
+
+#linecount
+/out

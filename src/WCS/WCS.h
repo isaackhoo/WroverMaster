@@ -101,7 +101,8 @@ public:
     WCS();
     bool init();
     void run();
-    bool updateStateChange();
+    
+    void updateStateChange();
 };
 
 // export only a single instance of WCS

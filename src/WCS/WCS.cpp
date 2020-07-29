@@ -341,7 +341,7 @@ void WCS::perform(WcsCommsFormat *formattedInput)
 
     // remove input upon completion
     delete formattedInput;
-}
+};
 
 void WCS::handleTcpInput()
 {
@@ -373,7 +373,7 @@ void WCS::handleTcpInput()
             etxIdx = -1;
         }
     }
-}
+};
 
 // --------------------------
 // Wcs Public Methods
@@ -387,7 +387,7 @@ WCS::WCS()
     this->lastPingMillis = 0;
     this->pong = false;
     this->droppedPings = 0;
-}
+};
 
 bool WCS::init()
 {
@@ -445,7 +445,7 @@ bool WCS::init()
 
     // return init control
     return res;
-}
+};
 
 void WCS::run()
 {
@@ -458,4 +458,12 @@ void WCS::run()
 
     // check echos
     this->echos->run(logMasterError, this->bindedSender);
-}
+};
+
+void WCS::updateStateChange()
+{
+    WcsCommsFormat stateChange;
+    stateChange.actionEnum = STATE;
+    stateChange.instructions = GET_TWO_DIGIT_STRING(status->getState());
+    this->send(stateChange);
+};

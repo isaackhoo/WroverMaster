@@ -77,7 +77,7 @@ bool Status::setPos(String pos)
     return true;
 };
 
-bool Status::setState(ENUM_SHUTTLE_STATE currentState, bool log)
+bool Status::setState(ENUM_SHUTTLE_STATE currentState, bool logAndSend)
 {
     if (currentState < 0 || currentState > Num_Of_Shuttle_States)
         return false;
@@ -87,9 +87,10 @@ bool Status::setState(ENUM_SHUTTLE_STATE currentState, bool log)
         this->state = currentState;
         String logStr = "Status updated to ";
         logStr += SHUTTLE_STATE_STRING[this->getState()];
-        if (log)
+        if (logAndSend)
         {
-            logMasterToSd(logStr);
+            logMaster(logStr);
+            wcs->updateStateChange();
         }
     }
     return true;

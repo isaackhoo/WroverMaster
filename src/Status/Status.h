@@ -5,8 +5,11 @@
 
 #include "common.h"
 #include "WCS/WCS.h"
+#include "Logger/Logger.h"
 #include "Logger/SD/SD.h"
 #include "Helpers/Local/LocalHelper.h"
+
+using namespace Logger;
 
 // -------------------------
 // Status Private Variables
