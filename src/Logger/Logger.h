@@ -3,8 +3,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "./LCD/LCD.h"
-#include "./SD/SD.h"
+#include "LCD/LCD.h"
+#include "SD/SD.h"
 
 namespace Logger
 {

@@ -3,7 +3,7 @@
 #ifndef ECHO_H
 #define ECHO_H
 
-#include "../include/common.h"
+#include "common.h"
 
 using SenderFunction = std::function<bool(String, bool, bool)>;
 

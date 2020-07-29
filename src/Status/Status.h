@@ -3,10 +3,10 @@
 #ifndef STATUS_H
 #define STATUS_H
 
-#include "../include/common.h"
-#include "../WCS/WCS.h"
-#include "../Logger/SD/SD.h"
-#include "../Helpers/Local/LocalHelper.h"
+#include "common.h"
+#include "WCS/WCS.h"
+#include "Logger/SD/SD.h"
+#include "Helpers/Local/LocalHelper.h"
 
 // -------------------------
 // Status Private Variables

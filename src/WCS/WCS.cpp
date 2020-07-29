@@ -114,11 +114,12 @@ void WCS::runPing()
             this->pongChecked = true;
             if (!this->pong)
             {
+                // ping was not replied
                 if (this->droppedPings < MAX_DROPPED_PINGS)
                     ++this->droppedPings;
                 else
                 {
-                    logMasterError(String(MAX_DROPPED_PINGS) + " pings dropped consecutively. Resetting chip");
+                    logMasterError("Server dropped " + String(MAX_DROPPED_PINGS) + " pings consecutively. Resetting chip");
                     resetChip();
                 }
             }
@@ -127,9 +128,7 @@ void WCS::runPing()
 
     // check if its time to ping server again
     if (currentMillis - this->lastPingMillis >= PING_INTERVAL)
-    {
         this->pingServer();
-    }
 };
 
 void WCS::startPings()
@@ -225,24 +224,28 @@ void WCS::perform(WcsCommsFormat *formattedInput)
     {
         recLog += "RETRIEVEBIN";
         // hand over control to slave handler
+        slave->onRetrieveBin(formattedInput->instructions);
         break;
     }
     case STOREBIN:
     {
         recLog += "STOREBIN";
         // hand over control to slave handler
+        slave->onStoreBin(formattedInput->instructions);
         break;
     }
     case MOVE:
     {
         recLog += "MOVE";
         // hand over control to slave handler
+        slave->onMove(formattedInput->instructions); 
         break;
     }
     case BATTERY:
     {
         recLog += "BATTERY";
         // hand over control to slave handler
+        slave->onBattery();
         break;
     }
     case STATE:

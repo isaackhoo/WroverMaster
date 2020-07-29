@@ -1,10 +1,16 @@
-#include "../include/common.h"
-#include "./Status/Status.h"
+#include "common.h"
+#include "controlCharacters.h"
 #include "./Helpers/Local/LocalHelper.h"
 #include "./WCS/WCS.h"
 #include "./Slave/Slave.h"
 
 using namespace Logger;
+
+const char *SOH = "\x01";
+const char *STX = "\x02";
+const char *ETX = "\x03";
+const char *EOT = "\x04";
+const char *NAK = "\x25";
 
 void setup()
 {

@@ -3,17 +3,17 @@
 #ifndef WCS_H
 #define WCS_H
 
-#include "../include/common.h"
-#include "../include/controlCharacters.h"
-#include "./Status/Status.h"
-#include "./Logger/Logger.h"
-#include "./Logger/SD/SD.h"
-#include "./Network/TCP/TCP.h"
-#include "./Network/Wifi/WifiNetwork.h"
-#include "./Helpers/Local/LocalHelper.h"
-#include "./Helpers/ESP/LocalEsp.h"
-#include "./Echo/Echo.h"
-
+#include "common.h"
+#include "controlCharacters.h"
+#include "Status/Status.h"
+#include "Logger/Logger.h"
+#include "Logger/SD/SD.h"
+#include "Network/TCP/TCP.h"
+#include "Network/Wifi/WifiNetwork.h"
+#include "Helpers/Local/LocalHelper.h"
+#include "Helpers/ESP/LocalEsp.h"
+#include "Echo/Echo.h"
+#include "Slave/Slave.h"
 
 using namespace Logger;
 
@@ -91,9 +91,9 @@ private:
     void pingServer();
     void runPing();
     void startPings();
+    void updatePingReceived();
 
     WcsCommsFormat *interpret(String);
-    void updatePingReceived();
     void perform(WcsCommsFormat *);
     void handleTcpInput();
 

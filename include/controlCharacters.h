@@ -1,4 +1,12 @@
-const char *SOH = "\x01";
-const char *STX = "\x02";
-const char *ETX = "\x03";
-const char *EOT = "\x04";
+#pragma once
+
+#ifndef CONTROLCHARACTERS_H
+#define CONTROLCHARACTERS_H
+
+extern const char *SOH;
+extern const char *STX;
+extern const char *ETX;
+extern const char *EOT;
+extern const char *NAK;
+
+#endif

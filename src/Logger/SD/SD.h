@@ -4,7 +4,7 @@
 #define SD_H
 
 #include <SD_MMC.h>
-#include "../../Network/Wifi/WifiNetwork.h"
+#include "Network/Wifi/WifiNetwork.h"
 
 extern bool isInit;
 extern String LogsDirectory;

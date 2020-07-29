@@ -201,10 +201,17 @@ bool Status::rehydrateStatus()
             String log = "Rehydrated Shuttle State to ";
             log += SHUTTLE_STATE_STRING[this->getState()];
             Logger::info(log);
-            res = true; // last extraction completed. May not contain action and instructions
             break;
         }
         case 3:
+        {
+            // shuttle position
+            this->setPos(token);
+            Logger::info("Rehydrated Shuttle Position to " + this->getPos());
+            res = true; // last extraction completed. May not contain action and instructions
+            break;
+        }
+        case 4:
         {
             // action enum
             this->setActionEnum(token);
@@ -212,7 +219,7 @@ bool Status::rehydrateStatus()
             res = false; // there should be instructions if action exists
             break;
         }
-        case 4:
+        case 5:
         {
             // instructions
             this->setInstructions(token);
@@ -244,6 +251,8 @@ void Status::saveStatus()
     statusString += this->getLevel();
     statusString += DEFAULT_STATUS_DELIMITER;
     statusString += GET_TWO_DIGIT_STRING(this->getState());
+    statusString += DEFAULT_STATUS_DELIMITER;
+    statusString += this->getPos();
     if (this->getActionEnum() != "")
     {
         statusString += DEFAULT_STATUS_DELIMITER;

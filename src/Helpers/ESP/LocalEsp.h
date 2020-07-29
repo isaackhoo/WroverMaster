@@ -4,7 +4,7 @@
 #define LOCALESP_H
 
 #include "Esp.h" // wrover library
-#include "../../Network/TCP/TCP.h"
+#include "Network/TCP/TCP.h"
 
 // reset chip
 extern void resetChip();

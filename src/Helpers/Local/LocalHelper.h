@@ -39,7 +39,4 @@ extern void resetChip();
 extern int findIndex(char*, char);
 extern int reverseFindIndex(char*, char);
 
-// Serial baud
-#define DEFAULT_SERIAL_BAUD_RATE 115200
-
 #endif

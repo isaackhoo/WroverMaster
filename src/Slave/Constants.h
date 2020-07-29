@@ -1,21 +1,47 @@
-const int DEFAULT_SERIAL_BAUD_RATE = 115200;
+#pragma once
 
-// components
+#ifndef SLAVECONSTANTS_H
+#define SLAVECONSTANTS_H
 
-
-// pings
-const unsigned long SLAVE_PING_INTERVAL = 1000 * 10;        // 10s
-const unsigned long SLAVE_PING_DROPPED_DURATION = 1000 * 1; // 1s after sending out ping
-const unsigned int SLAVE_MAX_DROPPED_PINGS = 3;
-
-// serial communications
-const String HEADER_DELIMITER = ",";
-const String BODY_DELIMITER = "-";
-struct SlaveCommsFormat
+namespace SlaveConstants
 {
-    String uuid;
-    int msgLength;          // message length including STX and ETX characters
-    String componentId;     // Identifies slave component to target
-    String componentAction; // enum containing component action to perform
-    String instructions;    // instructions associated with action to perform
-};
+    const int DEFAULT_SERIAL_BAUD_RATE = 115200;
+
+    // actions
+    enum ENUM_SLAVE_ACTIONS
+    {
+        SLAVE_ECHO = 0,
+        LOG,
+        LOGERROR,
+        SLAVE_PING,
+
+        ENGAGE_ESTOP,
+        DISENGAGE_ESTOP,
+
+        MOVETO, // implicitly uses brake and dual sensors
+
+        READ_BIN_SENSOR,
+
+        EXTEND_ARM,
+        HOME_ARM, // implicitly also uses arm sensors
+
+        EXTEND_FINGER_PAIR,
+        RETRACT_FINGER_PAIR,
+
+        SLAVE_BATTERY,
+    };
+
+    // instructions
+    const int INST_RACK_ID_LEN = 2;
+    const int INST_COL_ID_LEN = 2;
+    const int INST_BINPOS_LEN = 2;
+
+    // rack setup
+    const int MIN_COLUMN = -2;
+    const int MAX_COLUMN = 20;
+    const int MIN_BINSLOT = 1;
+    const int MAX_BINSLOT = 12;
+
+} // namespace SlaveConstants
+
+#endif

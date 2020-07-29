@@ -3,7 +3,7 @@
 #ifndef TCP_H
 #define TCP_H
 
-#include "../../Logger/Logger.h"
+#include "Logger/Logger.h"
 #include <WiFiClient.h>
 
 // const String serverIp = "192.168.1.1"; // actual server static IP;

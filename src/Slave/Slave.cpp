@@ -16,23 +16,18 @@ String Slave::createSendString(SlaveCommsFormat sendObj, bool includeBoundingCon
     // x+1    - HEADER_DELIMITER
     // x+2-y  - message length EXCLUDING STX and ETX
     // y+1    - STX
-    // y+2-z  - componentId-componentAction-instructions
+    // y+2-z  - stepAction-stepInstructions
     // z+1    - ETX
     // z+2    - EOT
-
-    int msgLength =
-        sendObj.componentId.length() + BODY_DELIMITER.length() + sendObj.componentAction.length() + BODY_DELIMITER.length() + sendObj.instructions.length();
 
     String sendString = "";
     if (includeBoundingControlChars)
         sendString += SOH;
-    sendString += String(millis());
+    sendString += sendObj.uuid || String(millis());
     sendString += HEADER_DELIMITER;
-    sendString += GET_TWO_DIGIT_STRING(msgLength);
+    sendString += GET_TWO_DIGIT_STRING(sendObj.messageLength);
     sendString += STX;
-    sendString += sendObj.componentId;
-    sendString += BODY_DELIMITER;
-    sendString += GET_TWO_DIGIT_STRING(sendObj.componentAction);
+    sendString += GET_TWO_DIGIT_STRING(sendObj.action);
     if (sendObj.instructions != "")
     {
         sendString += BODY_DELIMITER;
@@ -91,6 +86,8 @@ bool Slave::send(String msg, bool shouldLog, bool awaitEcho)
             msg.length(),
             msg);
     }
+
+    return res;
 };
 
 bool Slave::send(SlaveCommsFormat sendObj, bool shouldLog, bool awaitEcho)
@@ -108,20 +105,167 @@ bool Slave::send(SlaveCommsFormat sendObj)
     return this->send(sendObj, true, true);
 };
 
+bool Slave::send(Step *step)
+{
+    SlaveCommsFormat *stepFormat = new SlaveCommsFormat(
+        String(step->getStepAction()),
+        step->getStepInstructions());
+    bool res = this->send(*stepFormat);
+    delete stepFormat;
+    return res;
+};
+
 void Slave::pingSlaveChip()
 {
-    SlaveCommsFormat ping;
-    // TODO
+    SlaveCommsFormat *ping = new SlaveCommsFormat(String(SLAVE_PING), "");
+    this->pong = false;
+    this->pongChecked = false;
+    this->lastPingMillis = millis();
+    this->send(*ping, false, false);
+    delete ping;
 };
 
 void Slave::runPing()
 {
+    unsigned int currentMillis = millis();
 
+    // check for unreplied ping
+    if (currentMillis - this->lastPingMillis >= SLAVE_PING_DROPPED_DURATION)
+    {
+        if (!this->pongChecked)
+        {
+            this->pongChecked = true;
+            if (!this->pong)
+            {
+                // ping was not replied
+                if (this->droppedPings < SLAVE_MAX_DROPPED_PINGS)
+                    ++this->droppedPings;
+                else
+                {
+                    logMasterError("Slave dropped " + String(SLAVE_MAX_DROPPED_PINGS) + " pings consecutively. Resetting chip");
+                    resetChip();
+                }
+            }
+        }
+    }
+
+    // check if it should ping slave again
+    if (currentMillis - this->lastPingMillis >= SLAVE_PING_INTERVAL)
+        this->pingSlaveChip();
 };
 
 void Slave::startPings()
 {
+    // start pinging slave chip
+    this->pingSlaveChip();
+};
 
+void Slave::updatePingReceived()
+{
+    this->pong = true;
+    this->droppedPings = 0;
+};
+
+SlaveCommsFormat *Slave::interpret(String input)
+{
+    // receive format
+    // x      - uuid - millis
+    // x+1    - HEADER_DELIMITER
+    // x+2-y  - message length EXCLUDING STX and ETX
+    // y+1    - STX
+    // y+2-z  - stepAction-stepInstructions
+    // z+1    - ETX
+
+    int headerDeliIdx = input.indexOf(HEADER_DELIMITER);
+    int stxIdx = input.indexOf(STX, headerDeliIdx + 1);
+    int bdyDeliIdx = input.indexOf(BODY_DELIMITER, stxIdx + 1); // can be -1
+    int etxIdx = input.indexOf(ETX, stxIdx + 1);
+
+    SlaveCommsFormat *formattedInput = new SlaveCommsFormat();
+    formattedInput->uuid = input.substring(0, headerDeliIdx);
+    formattedInput->messageLength = input.substring(headerDeliIdx + 1, stxIdx).toInt();
+    int endStepActionIdx = bdyDeliIdx > 0 ? bdyDeliIdx : etxIdx;
+    formattedInput->action = input.substring(stxIdx + 1, endStepActionIdx);
+    if (bdyDeliIdx > 0)
+        formattedInput->instructions = input.substring(bdyDeliIdx + 1, etxIdx);
+
+    // validate message
+    String msg = input.substring(stxIdx + 1, etxIdx);
+    if (formattedInput->messageLength != msg.length())
+    {
+        logSlaveError("Invalid message - " + msg);
+        delete formattedInput;
+        return NULL;
+    }
+
+    return formattedInput;
+};
+
+void Slave::perform(SlaveCommsFormat *formattedInput)
+{
+    if (formattedInput == NULL)
+        return;
+
+    switch ((ENUM_SLAVE_ACTIONS)formattedInput->action.toInt())
+    {
+    case SLAVE_ECHO:
+    {
+        this->echos->verifyEcho(formattedInput->uuid);
+        break;
+    }
+    case LOG:
+    {
+        logSlave(formattedInput->instructions);
+        break;
+    }
+    case LOGERROR:
+    {
+        logSlaveError(formattedInput->instructions);
+        break;
+    }
+    case SLAVE_PING:
+    {
+        this->updatePingReceived();
+        break;
+    }
+    case ENGAGE_ESTOP:
+    case DISENGAGE_ESTOP:
+    case MOVETO:
+    // case READ_BIN_SENSOR:
+    case EXTEND_ARM:
+    case HOME_ARM:
+    case EXTEND_FINGER_PAIR:
+    case RETRACT_FINGER_PAIR:
+    {
+        Step *next = this->taskManager->validateStep(formattedInput->instructions);
+        if (next == NULL)
+        {
+            // task is complete
+            logSlave("Task completed");
+            // notify server task completion
+        }
+        else
+        {
+            if (next->getStepStatus() == STEP_ERROR)
+                logSlaveError(next->getStepErrorDetails());
+            else if (next->getStepStatus() == STEP_ACTIVE)
+                this->send(next);
+            else
+                logMasterError("Invalid step status event");
+        }
+        break;
+    }
+    case SLAVE_BATTERY:
+    {
+        // TODO
+        break;
+    }
+    default:
+        break;
+    }
+
+    // free up memeory taken by formatted input
+    delete formattedInput;
 };
 
 void Slave::handleSerialInput()
@@ -139,7 +283,7 @@ void Slave::handleSerialInput()
             this->serialIn = this->serialIn.substring(eotIdx + 1);
 
         // interpret and run input
-        // TODO
+        this->perform(this->interpret(input));
 
         // check for more inputs
         if (this->serialIn.length() > 0)
@@ -155,6 +299,13 @@ void Slave::handleSerialInput()
     }
 }
 
+void Slave::updateStatus(String action, String inst)
+{
+    status->setActionEnum(action);
+    status->setInstructions(inst);
+    status->saveStatus();
+};
+
 // --------------------------
 // Wcs Public Methods
 // --------------------------
@@ -168,6 +319,8 @@ Slave::Slave()
     this->lastPingMillis = 0;
     this->pong = false;
     this->droppedPings = 0;
+
+    this->taskManager = new Task();
 };
 
 bool Slave::init(HardwareSerial *serialPort)
@@ -176,6 +329,7 @@ bool Slave::init(HardwareSerial *serialPort)
     this->ss->end();
     this->ss->begin(DEFAULT_SERIAL_BAUD_RATE);
     logMaster("Slave serial started. Baud " + String(DEFAULT_SERIAL_BAUD_RATE));
+    return true;
 };
 
 void Slave::run()
@@ -190,3 +344,28 @@ void Slave::run()
     // check echos
     this->echos->run(logMasterError, this->bindedSender);
 }
+
+void Slave::onRetrieveBin(String inst)
+{
+    this->updateStatus(GET_TWO_DIGIT_STRING(RETRIEVEBIN), inst);
+    this->taskManager->createRetrievalTask(inst);
+    this->send(this->taskManager->begin());
+};
+
+void Slave::onStoreBin(String inst)
+{
+    this->updateStatus(GET_TWO_DIGIT_STRING(STOREBIN), inst);
+    this->taskManager->createStorageTask(inst);
+    this->send(this->taskManager->begin());
+};
+
+void Slave::onMove(String inst)
+{
+    this->updateStatus(GET_TWO_DIGIT_STRING(MOVE), inst);
+    this->taskManager->createMovementTask(inst);
+    this->send(this->taskManager->begin());
+};
+
+void Slave::onBattery(){
+    // TODO
+};
