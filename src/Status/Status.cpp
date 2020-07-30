@@ -1,20 +1,17 @@
-#include "./Status.h"
+#include "Status.h"
 
-// -------------------------
-// Status Private Variables
-// -------------------------
-const int DEFAULT_ID_LENGTH = 4;
-const char *DEFAULT_ID = "-1-1";
+// ----------------------------
+// Status Constants Declaration
+// ----------------------------
+const int StatusConstants::DEFAULT_ID_LENGTH = 4;
+const String StatusConstants::DEFAULT_ID = "-1-1";
 
-const int DEFAULT_LEVEL_MIN = 1;
-const int DEFAULT_LEVEL_MAX = 21;
-const char *DEFAULT_LEVEL = "02";
-const char DEFAULT_STATUS_DELIMITER = ',';
+const int StatusConstants::DEFAULT_LEVEL_MIN = 1;
+const int StatusConstants::DEFAULT_LEVEL_MAX = 21;
+const String StatusConstants::DEFAULT_LEVEL = "02";
+const String StatusConstants::DEFAULT_STATUS_DELIMITER = ",";
 
-// -------------------------
-// Status Public Variables
-// -------------------------
-Status *status = new Status();
+const String StatusConstants::SHUTTLE_STATE_STRING[] = {"IDLE", "STORING", "RETRIEVING", "MOVING", "ERROR", "AWAITING"};
 
 // -------------------------
 // Status Public Methods
@@ -27,6 +24,11 @@ Status::Status()
 Status::~Status(){};
 
 // Setters
+void Status::setWcsContext(WCS *context)
+{
+    this->wcsInstance = context;
+};
+
 bool Status::setId(String id)
 {
     if (id.length() != DEFAULT_ID_LENGTH)
@@ -90,7 +92,7 @@ bool Status::setState(ENUM_SHUTTLE_STATE currentState, bool logAndSend)
         if (logAndSend)
         {
             logMaster(logStr);
-            wcs->updateStateChange();
+            this->wcsInstance->updateStateChange();
         }
     }
     return true;
@@ -143,7 +145,7 @@ bool Status::setDefault()
     if (res)
         res = this->setLevel(DEFAULT_LEVEL);
     if (res)
-        res = this->setState(ENUM_SHUTTLE_STATE::IDLE);
+        res = this->setState(ENUM_SHUTTLE_STATE::IDLE, false);
     return res;
 };
 
@@ -198,7 +200,7 @@ bool Status::rehydrateStatus()
         case 2:
         {
             // state
-            this->setState((ENUM_SHUTTLE_STATE)token.toInt());
+            this->setState((ENUM_SHUTTLE_STATE)token.toInt(), false);
             String log = "Rehydrated Shuttle State to ";
             log += SHUTTLE_STATE_STRING[this->getState()];
             Logger::info(log);

@@ -3,47 +3,19 @@
 #ifndef TASK_H
 #define TASK_H
 
+#include "Slave/Task/Constants.h"
 #include "Slave/Step/Step.h"
 #include "Status/Status.h"
 
-// direction
-enum ENUM_DIRECTION
-{
-    LEFT = -1,
-    RIGHT = 1
-};
+// forward declaration
+class Status;
 
-// extension
-enum ENUM_EXTENSION_DEPTH
-{
-    FIRST_DEPTH = 642,
-    SECOND_DEPTH = 1185,
-    BUFFER_DEPTH = 900,
-};
-
-// interpretation
-struct TaskInstructions
-{
-    String rack;
-    String column;
-    String binPos;
-    ENUM_EXTENSION_DEPTH depth;
-    ENUM_DIRECTION direction;
-};
-
-// movement
-extern const int MV_SLOTHOLES_PER_COL;
-enum ENUM_AMOVE_SLOTHOLE
-{
-    POS_BUFFER = 0,
-    POS_IN_LIFTER = -1,
-    POS_BATTERY_CHANGE = -2,
-    POS_MAINTENANCE = 119
-};
+using namespace TaskConstants;
 
 class Task
 {
 private:
+    Status *statusInstance;
     Step *HEAD;
     Step *TAIL;
     Step *iterator;
@@ -62,7 +34,7 @@ private:
     Step *releaseBin(ENUM_EXTENSION_DEPTH, ENUM_DIRECTION);
 
 public:
-    Task();
+    Task(Status *);
     ~Task();
 
     // getters

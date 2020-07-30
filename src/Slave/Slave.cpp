@@ -1,9 +1,25 @@
-#include "./Slave.h"
+#include "Slave.h"
 
-// --------------------------
-// Wcs Public Variables
-// --------------------------
-Slave *slave = new Slave();
+// ---------------------------
+// Slave Constants Declaration
+// ---------------------------
+const int SlaveConstants::DEFAULT_SERIAL_BAUD_RATE = 115200;
+
+const int SlaveConstants::INST_RACK_ID_LEN = 2;
+const int SlaveConstants::INST_COL_ID_LEN = 2;
+const int SlaveConstants::INST_BINPOS_LEN = 2;
+
+const int SlaveConstants::MIN_COLUMN = -2;
+const int SlaveConstants::MAX_COLUMN = 20;
+const int SlaveConstants::MIN_BINSLOT = 1;
+const int SlaveConstants::MAX_BINSLOT = 12;
+
+const unsigned long SlaveConstants::SLAVE_PING_INTERVAL = 1000 * 10;        // 10s
+const unsigned long SlaveConstants::SLAVE_PING_DROPPED_DURATION = 1000 * 1; // 1s after sending out ping
+const unsigned int SlaveConstants::SLAVE_MAX_DROPPED_PINGS = 3;
+
+const String SlaveConstants::HEADER_DELIMITER = ",";
+const String SlaveConstants::BODY_DELIMITER = "-";
 
 // --------------------------
 // Wcs Private Methods
@@ -243,7 +259,7 @@ void Slave::perform(SlaveCommsFormat *formattedInput)
             // task is complete
             logSlave("Task completed");
             // notify server task completion
-            wcs->notifyTaskCompletion();
+            this->wcsInstance->notifyTaskCompletion();
         }
         else
         {
@@ -302,9 +318,10 @@ void Slave::handleSerialInput()
 
 void Slave::updateStatus(String action, String inst)
 {
-    status->setActionEnum(action);
-    status->setInstructions(inst);
-    status->saveStatus();
+    this->statusInstance->setActionEnum(action);
+    this->statusInstance->setInstructions(inst);
+    this->statusInstance->setActivityState();
+    this->statusInstance->saveStatus();
 };
 
 // --------------------------
@@ -321,16 +338,24 @@ Slave::Slave()
     this->pong = false;
     this->droppedPings = 0;
 
-    this->taskManager = new Task();
+    this->taskManager = NULL;
 };
 
-bool Slave::init(HardwareSerial *serialPort)
+bool Slave::init(HardwareSerial *serialPort, Status *context)
 {
     this->ss = serialPort;
     this->ss->end();
     this->ss->begin(DEFAULT_SERIAL_BAUD_RATE);
     logMaster("Slave serial started. Baud " + String(DEFAULT_SERIAL_BAUD_RATE));
+    this->statusInstance = context;
+
+    this->taskManager = new Task(this->statusInstance);
     return true;
+};
+
+void Slave::setWcsInstance(WCS *context)
+{
+    this->wcsInstance = context;
 };
 
 void Slave::run()

@@ -1,5 +1,8 @@
 #include "./SD.h"
 
+// -----------------------------
+// SD CONSTANTS DECLARATION
+// -----------------------------
 bool isInit = false;
 String LogsDirectory = "/Logs";
 String StatusDirectory = "/Status";

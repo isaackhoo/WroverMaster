@@ -6,7 +6,7 @@
 #include "common.h"
 #include "controlCharacters.h"
 #include <HardwareSerial.h>
-#include "Constants.h"
+#include "Slave/Constants.h"
 #include "Task/Task.h"
 #include "Echo/Echo.h"
 #include "Helpers/ESP/LocalEsp.h"
@@ -14,37 +14,13 @@
 #include "Status/Status.h"
 #include "WCS/WCS.h"
 
+// forward declaration
+class Status;
+class Task;
+class WCS;
+
 using namespace Logger;
 using namespace SlaveConstants;
-
-// pings
-static const unsigned long SLAVE_PING_INTERVAL = 1000 * 10;        // 10s
-static const unsigned long SLAVE_PING_DROPPED_DURATION = 1000 * 1; // 1s after sending out ping
-static const unsigned int SLAVE_MAX_DROPPED_PINGS = 3;
-
-// serial communications
-static const String HEADER_DELIMITER = ",";
-static const String BODY_DELIMITER = "-";
-class SlaveCommsFormat
-{
-public:
-    String uuid;
-    int messageLength; // excludes STX and ETX
-    String action;
-    String instructions;
-
-    SlaveCommsFormat(String uuid, String act, String inst)
-    {
-        this->uuid = uuid;
-        this->action = act;
-        this->instructions = inst;
-        this->messageLength = this->action.length() + BODY_DELIMITER.length() + this->instructions.length();
-    };
-    SlaveCommsFormat(String act, String inst) : SlaveCommsFormat(String(millis()), act, inst){};
-    SlaveCommsFormat(){};
-};
-
-class Task; // forward linking Task
 
 // --------------------------
 // Slave Public Methods
@@ -53,6 +29,8 @@ class Slave
 {
 private:
     HardwareSerial *ss;
+    Status *statusInstance;
+    WCS *wcsInstance;
     Echo *echos;
     SenderFunction bindedSender;
 
@@ -86,7 +64,8 @@ private:
 
 public:
     Slave();
-    bool init(HardwareSerial *);
+    bool init(HardwareSerial *, Status *);
+    void setWcsInstance(WCS *);
     void run();
 
     void onRetrieveBin(String);
@@ -94,6 +73,5 @@ public:
     void onMove(String);
     void onBattery();
 };
-extern Slave *slave;
 
 #endif

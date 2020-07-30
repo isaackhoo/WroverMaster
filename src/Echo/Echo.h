@@ -4,11 +4,11 @@
 #define ECHO_H
 
 #include "common.h"
+#include "Echo/Constants.h"
 
 using SenderFunction = std::function<bool(String, bool, bool)>;
+using namespace EchoConstants;
 
-const unsigned int DEFAULT_ECHO_TIMEOUT = 1000;
-const unsigned int DEFAULT_MAX_DROPS = 3;
 struct EchoNode
 {
     String uuid;

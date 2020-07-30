@@ -4,19 +4,12 @@
 #define STEP_H
 
 #include "common.h"
+#include "Slave/Step/Constants.h"
 #include "Slave/Constants.h"
 #include "controlCharacters.h"
 
+using namespace StepConstants;
 using namespace SlaveConstants;
-
-enum ENUM_STEP_STATUS
-{
-    STEP_AWAITING_START = 0,
-    STEP_ACTIVE,
-    STEP_COMPLETED,
-    STEP_ERROR,
-    Num_Of_Step_Status
-};
 
 class Step
 {

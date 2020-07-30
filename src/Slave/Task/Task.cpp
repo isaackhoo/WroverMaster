@@ -1,7 +1,9 @@
 #include "Task.h"
 
-// movement
-const int MV_SLOTHOLES_PER_COL = 6;
+// --------------------------
+// Task Constants Declaration
+// --------------------------
+const int TaskConstants::MV_SLOTHOLES_PER_COL = 6;
 
 // --------------------------
 // Task Private Methods
@@ -125,7 +127,7 @@ String Task::toSlothole(int col, int binPos)
 Step *Task::moveTo(String slothole)
 {
     bool utilizeEStop = false;
-    if (status->getPos().toInt() == POS_IN_LIFTER || slothole.toInt() == POS_IN_LIFTER)
+    if (this->statusInstance->getPos().toInt() == POS_IN_LIFTER || slothole.toInt() == POS_IN_LIFTER)
         utilizeEStop = true;
 
     Step *disengageEstop = utilizeEStop ? new Step(DISENGAGE_ESTOP, 0) : NULL;
@@ -164,8 +166,9 @@ Step *Task::releaseBin(ENUM_EXTENSION_DEPTH depth, ENUM_DIRECTION direction)
 // --------------------------
 // Task Public Methods
 // --------------------------
-Task::Task()
+Task::Task(Status *context)
 {
+    this->statusInstance = context;
     this->HEAD = NULL;
     this->TAIL = NULL;
     this->iterator = NULL;

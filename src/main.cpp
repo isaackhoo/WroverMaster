@@ -1,8 +1,9 @@
 #include "common.h"
 #include "controlCharacters.h"
-#include "./Helpers/Local/LocalHelper.h"
-#include "./WCS/WCS.h"
-#include "./Slave/Slave.h"
+#include "Helpers/Local/LocalHelper.h"
+#include "Status/Status.h"
+#include "WCS/WCS.h"
+#include "Slave/Slave.h"
 
 using namespace Logger;
 
@@ -12,6 +13,10 @@ const char *ETX = "\x03";
 const char *EOT = "\x04";
 const char *NAK = "\x25";
 
+Status *status;
+WCS *wcs;
+Slave *slave;
+
 void setup()
 {
   bool initializationRes = false;
@@ -19,11 +24,24 @@ void setup()
   // initialize logger
   initializationRes = initLogger();
 
+  // create shuttle status
+  status = new Status();
+
   // initialize WCS - connect to wifi and to server
-  initializationRes = wcs->init();
+  wcs = new WCS();
+  initializationRes = wcs->init(status);
+
+  // bind wcs to status
+  status->setWcsContext(wcs);
 
   // initialize Slave - start serial to slave chip
-  initializationRes = slave->init(&Serial);
+  slave = new Slave();
+  initializationRes = slave->init(&Serial, status);
+
+  // bind slave to wcs
+  wcs->setSlaveInstance(slave);
+  // bind wcs to slave
+  slave->setWcsInstance(wcs);
 
   if (!initializationRes)
     while (true)

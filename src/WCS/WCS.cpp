@@ -1,18 +1,14 @@
-#include "./WCS.h"
+#include "WCS/WCS.h"
 
 // --------------------------
-// Wcs Private Variables
+// Wcs Constants Declaration
 // --------------------------
-const unsigned long PING_INTERVAL = 1000 * 10;        // 10s
-const unsigned long PING_DROPPED_DURATION = 1000 * 1; // 1s after sending out ping
-const unsigned int MAX_DROPPED_PINGS = 3;
+const unsigned long WcsConstants::PING_INTERVAL = 1000 * 10;        // 10s
+const unsigned long WcsConstants::PING_DROPPED_DURATION = 1000 * 1; // 1s after sending out ping
+const unsigned int WcsConstants::MAX_DROPPED_PINGS = 3;
 
-const unsigned long ECHO_TIMEOUT_DURATION = 1000 * 5; // 5s
-
-// --------------------------
-// Wcs Public Variables
-// --------------------------
-WCS *wcs = new WCS();
+const unsigned long WcsConstants::ECHO_TIMEOUT_DURATION = 1000 * 5; // 5s
+const int WcsConstants::DEFAULT_ENUM_VALUE_LENGTH = 2;
 
 // --------------------------
 // Wcs Private Methods
@@ -29,7 +25,7 @@ String WCS::createSendString(WcsCommsFormat sendObj, bool includeBoundingControl
     String sendString = "";
     if (includeBoundingControlChars)
         sendString += STX;
-    sendString += status->getId();
+    sendString += this->statusInstance->getId();
     sendString += GET_TWO_DIGIT_STRING(sendObj.actionEnum);
     sendString += sendObj.instructions;
     if (includeBoundingControlChars)
@@ -172,9 +168,9 @@ void WCS::perform(WcsCommsFormat *formattedInput)
     // update status
     if (action == RETRIEVEBIN || action == STOREBIN || action == MOVE)
     {
-        status->setActionEnum(formattedInput->actionEnum);
-        status->setInstructions(formattedInput->instructions);
-        status->saveStatus();
+        this->statusInstance->setActionEnum(formattedInput->actionEnum);
+        this->statusInstance->setInstructions(formattedInput->instructions);
+        this->statusInstance->saveStatus();
     }
 
     // Echo back input
@@ -199,8 +195,8 @@ void WCS::perform(WcsCommsFormat *formattedInput)
     {
         recLog += "LOGIN";
         // update ID
-        status->setId(formattedInput->id);
-        status->saveStatus();
+        this->statusInstance->setId(formattedInput->id);
+        this->statusInstance->saveStatus();
 
         // start pings to server
         this->startPings();
@@ -224,28 +220,28 @@ void WCS::perform(WcsCommsFormat *formattedInput)
     {
         recLog += "RETRIEVEBIN";
         // hand over control to slave handler
-        slave->onRetrieveBin(formattedInput->instructions);
+        this->slaveInstance->onRetrieveBin(formattedInput->instructions);
         break;
     }
     case STOREBIN:
     {
         recLog += "STOREBIN";
         // hand over control to slave handler
-        slave->onStoreBin(formattedInput->instructions);
+        this->slaveInstance->onStoreBin(formattedInput->instructions);
         break;
     }
     case MOVE:
     {
         recLog += "MOVE";
         // hand over control to slave handler
-        slave->onMove(formattedInput->instructions); 
+        this->slaveInstance->onMove(formattedInput->instructions);
         break;
     }
     case BATTERY:
     {
         recLog += "BATTERY";
         // hand over control to slave handler
-        slave->onBattery();
+        this->slaveInstance->onBattery();
         break;
     }
     case STATE:
@@ -257,8 +253,8 @@ void WCS::perform(WcsCommsFormat *formattedInput)
     case LEVEL:
     {
         recLog += "LEVEL";
-        status->setLevel(formattedInput->instructions);
-        status->saveStatus();
+        this->statusInstance->setLevel(formattedInput->instructions);
+        this->statusInstance->saveStatus();
         break;
     }
     case SET:
@@ -273,27 +269,27 @@ void WCS::perform(WcsCommsFormat *formattedInput)
         case MANUAL_SET_DEFAULT:
         {
             // set status to chip defaults, but do not save
-            status->setDefault();
+            this->statusInstance->setDefault();
             break;
         }
         case MANUAL_SET_ID:
         {
-            status->setId(manualInstructions);
-            status->saveStatus();
+            this->statusInstance->setId(manualInstructions);
+            this->statusInstance->saveStatus();
             additionalLogs = "[Manual] ID updated to " + manualInstructions;
             break;
         }
         case MANUAL_SET_LEVEL:
         {
-            status->setLevel(manualInstructions);
-            status->saveStatus();
+            this->statusInstance->setLevel(manualInstructions);
+            this->statusInstance->saveStatus();
             additionalLogs = "[Manual] Level updated to " + manualInstructions;
             break;
         }
         case MANUAL_SET_STATE:
         {
-            status->setState((ENUM_SHUTTLE_STATE)manualInstructions.toInt());
-            status->saveStatus();
+            this->statusInstance->setState((ENUM_SHUTTLE_STATE)manualInstructions.toInt());
+            this->statusInstance->saveStatus();
             additionalLogs = String("[Manual] Shuttle State updated to ") + String(SHUTTLE_STATE_STRING[manualInstructions.toInt()]);
             break;
         }
@@ -389,12 +385,15 @@ WCS::WCS()
     this->droppedPings = 0;
 };
 
-bool WCS::init()
+bool WCS::init(Status *context)
 {
     bool res = false;
+    // bind status
+    this->statusInstance = context;
+
     // rehydrate status
     logMaster("Rehydrating Shuttle Status");
-    res = status->rehydrateStatus();
+    res = this->statusInstance->rehydrateStatus();
     if (!res)
     {
         logMaster("Failed to complete Rehydration process");
@@ -431,9 +430,9 @@ bool WCS::init()
 
     // retrieve existing shuttle status
     WcsCommsFormat *wcsLoginMsg = new WcsCommsFormat();
-    wcsLoginMsg->id = status->getId();
-    wcsLoginMsg->instructions = GET_TWO_DIGIT_STRING(status->getLevel());
-    wcsLoginMsg->instructions += GET_TWO_DIGIT_STRING(status->getStringState());
+    wcsLoginMsg->id = this->statusInstance->getId();
+    wcsLoginMsg->instructions = GET_TWO_DIGIT_STRING(this->statusInstance->getLevel());
+    wcsLoginMsg->instructions += GET_TWO_DIGIT_STRING(this->statusInstance->getStringState());
     wcsLoginMsg->actionEnum = GET_TWO_DIGIT_STRING(LOGIN);
 
     logMaster("Logging in to Server");
@@ -445,6 +444,11 @@ bool WCS::init()
 
     // return init control
     return res;
+};
+
+void WCS::setSlaveInstance(Slave *context)
+{
+    this->slaveInstance = context;
 };
 
 void WCS::run()
@@ -464,19 +468,19 @@ void WCS::updateStateChange()
 {
     WcsCommsFormat stateChange;
     stateChange.actionEnum = STATE;
-    stateChange.instructions = GET_TWO_DIGIT_STRING(status->getState());
+    stateChange.instructions = GET_TWO_DIGIT_STRING(this->statusInstance->getState());
     this->send(stateChange);
 };
 
 void WCS::notifyTaskCompletion()
 {
     WcsCommsFormat taskCompletion;
-    taskCompletion.actionEnum = (ENUM_WCS_ACTIONS)status->getActionEnum().toInt();
+    taskCompletion.actionEnum = (ENUM_WCS_ACTIONS)this->statusInstance->getActionEnum().toInt();
     taskCompletion.instructions = "success";
     this->send(taskCompletion);
 
     // update shuttle status to IDLE
-    status->setActionEnum = IDLE;
-    status->clearInstructions();
-    status->saveStatus();
+    this->statusInstance->setActionEnum(GET_TWO_DIGIT_STRING(IDLE));
+    this->statusInstance->clearInstructions();
+    this->statusInstance->saveStatus();
 };

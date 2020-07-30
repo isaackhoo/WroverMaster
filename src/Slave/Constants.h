@@ -5,7 +5,7 @@
 
 namespace SlaveConstants
 {
-    const int DEFAULT_SERIAL_BAUD_RATE = 115200;
+    extern const int DEFAULT_SERIAL_BAUD_RATE;
 
     // actions
     enum ENUM_SLAVE_ACTIONS
@@ -32,15 +32,42 @@ namespace SlaveConstants
     };
 
     // instructions
-    const int INST_RACK_ID_LEN = 2;
-    const int INST_COL_ID_LEN = 2;
-    const int INST_BINPOS_LEN = 2;
+    extern const int INST_RACK_ID_LEN;
+    extern const int INST_COL_ID_LEN;
+    extern const int INST_BINPOS_LEN;
 
     // rack setup
-    const int MIN_COLUMN = -2;
-    const int MAX_COLUMN = 20;
-    const int MIN_BINSLOT = 1;
-    const int MAX_BINSLOT = 12;
+    extern const int MIN_COLUMN;
+    extern const int MAX_COLUMN;
+    extern const int MIN_BINSLOT;
+    extern const int MAX_BINSLOT;
+
+    // pings
+    extern const unsigned long SLAVE_PING_INTERVAL;        // 10s
+    extern const unsigned long SLAVE_PING_DROPPED_DURATION; // 1s after sending out ping
+    extern const unsigned int SLAVE_MAX_DROPPED_PINGS;
+
+    // serial communications
+    extern const String HEADER_DELIMITER;
+    extern const String BODY_DELIMITER;
+    class SlaveCommsFormat
+    {
+    public:
+        String uuid;
+        int messageLength; // excludes STX and ETX
+        String action;
+        String instructions;
+
+        SlaveCommsFormat(String uuid, String act, String inst)
+        {
+            this->uuid = uuid;
+            this->action = act;
+            this->instructions = inst;
+            this->messageLength = this->action.length() + BODY_DELIMITER.length() + this->instructions.length();
+        };
+        SlaveCommsFormat(String act, String inst) : SlaveCommsFormat(String(millis()), act, inst){};
+        SlaveCommsFormat(){};
+    };
 
 } // namespace SlaveConstants
 

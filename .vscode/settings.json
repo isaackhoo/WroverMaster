@@ -1,6 +1,11 @@
 {
     "files.associations": {
-        "functional": "cpp"
+        "functional": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

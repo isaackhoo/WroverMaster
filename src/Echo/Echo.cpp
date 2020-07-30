@@ -1,5 +1,28 @@
 #include "./Echo.h"
 
+// ---------------------------
+// Echo Constants Declaration
+// ---------------------------
+const unsigned int EchoConstants::DEFAULT_ECHO_TIMEOUT = 1000;
+const unsigned int EchoConstants::DEFAULT_MAX_DROPS = 3;
+
+// ---------------------------
+// Echo Private Methods
+// ---------------------------
+void Echo::incrementTotalEchos()
+{
+    ++this->totalEchos;
+};
+
+void Echo::decrementTotalEchos()
+{
+    if (this->totalEchos > 0)
+        --this->totalEchos;
+};
+
+// ---------------------------
+// Echo Public Methods
+// ---------------------------
 Echo::Echo()
 {
     this->HEAD = NULL;
@@ -18,17 +41,6 @@ void Echo::setMaxDrops(unsigned int maxDrops)
 {
     this->maxDrops = maxDrops;
 };
-
-void Echo::incrementTotalEchos()
-{
-    ++this->totalEchos;
-}
-
-void Echo::decrementTotalEchos()
-{
-    if (this->totalEchos > 0)
-        --this->totalEchos;
-}
 
 void Echo::pushEcho(String uuid, unsigned int timeMillis, int messageLength, String msg)
 {
@@ -112,12 +124,12 @@ bool Echo::verifyEcho(String uuid)
     // iterate linked list to find node with same uuid
     // if found, remove node from linked list and returns the echo found
     return this->removeEcho(uuid);
-}
+};
 
 int Echo::getTotalEchos()
 {
     return this->totalEchos;
-}
+};
 
 void Echo::reset()
 {
@@ -126,7 +138,7 @@ void Echo::reset()
     {
         this->removeEcho(this->HEAD->uuid);
     }
-}
+};
 
 void Echo::run(void (*logger)(String), SenderFunction sender)
 {
@@ -182,4 +194,4 @@ void Echo::run(void (*logger)(String), SenderFunction sender)
             logger(maxDropLog);
         }
     }
-}
+};
