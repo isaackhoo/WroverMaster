@@ -467,3 +467,16 @@ void WCS::updateStateChange()
     stateChange.instructions = GET_TWO_DIGIT_STRING(status->getState());
     this->send(stateChange);
 };
+
+void WCS::notifyTaskCompletion()
+{
+    WcsCommsFormat taskCompletion;
+    taskCompletion.actionEnum = (ENUM_WCS_ACTIONS)status->getActionEnum().toInt();
+    taskCompletion.instructions = "success";
+    this->send(taskCompletion);
+
+    // update shuttle status to IDLE
+    status->setActionEnum = IDLE;
+    status->clearInstructions();
+    status->saveStatus();
+};

@@ -243,6 +243,7 @@ void Slave::perform(SlaveCommsFormat *formattedInput)
             // task is complete
             logSlave("Task completed");
             // notify server task completion
+            wcs->notifyTaskCompletion();
         }
         else
         {

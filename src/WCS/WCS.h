@@ -103,6 +103,7 @@ public:
     void run();
     
     void updateStateChange();
+    void notifyTaskCompletion();
 };
 
 // export only a single instance of WCS
