@@ -39,7 +39,7 @@ String Slave::createSendString(SlaveCommsFormat sendObj, bool includeBoundingCon
     String sendString = "";
     if (includeBoundingControlChars)
         sendString += SOH;
-    sendString += sendObj.uuid || String(millis());
+    sendString += sendObj.uuid != "" ? sendObj.uuid : String(millis());
     sendString += HEADER_DELIMITER;
     sendString += GET_TWO_DIGIT_STRING(sendObj.messageLength);
     sendString += STX;
@@ -64,7 +64,7 @@ bool Slave::serialRead()
 {
     if (this->ss->available() > 0)
     {
-        this->serialIn = this->ss->readString();
+        this->serialIn += this->ss->readString();
         return true;
     }
     return false;
@@ -143,6 +143,9 @@ void Slave::pingSlaveChip()
 
 void Slave::runPing()
 {
+    if (!this->pingsStarted)
+        return;
+
     unsigned int currentMillis = millis();
 
     // check for unreplied ping
@@ -159,7 +162,7 @@ void Slave::runPing()
                 else
                 {
                     logMasterError("Slave dropped " + String(SLAVE_MAX_DROPPED_PINGS) + " pings consecutively. Resetting chip");
-                    resetChip();
+                    this->pingsStarted = false;
                 }
             }
         }
@@ -173,13 +176,22 @@ void Slave::runPing()
 void Slave::startPings()
 {
     // start pinging slave chip
+    this->droppedPings = 0;
     this->pingSlaveChip();
+    this->pingsStarted = true;
 };
 
 void Slave::updatePingReceived()
 {
     this->pong = true;
     this->droppedPings = 0;
+};
+
+void Slave::resetSlave()
+{
+     SlaveCommsFormat *resetCmd = new SlaveCommsFormat(String(SLAVE_RESET), "");
+    this->send(*resetCmd, false, false);
+    delete resetCmd;
 };
 
 SlaveCommsFormat *Slave::interpret(String input)
@@ -222,8 +234,28 @@ void Slave::perform(SlaveCommsFormat *formattedInput)
     if (formattedInput == NULL)
         return;
 
-    switch ((ENUM_SLAVE_ACTIONS)formattedInput->action.toInt())
+    ENUM_SLAVE_ACTIONS action = (ENUM_SLAVE_ACTIONS)formattedInput->action.toInt();
+
+    // echo back message to slave
+    if (action != SLAVE_LOGIN && action != SLAVE_PING && action != SLAVE_ECHO)
     {
+        SlaveCommsFormat *echoReply = new SlaveCommsFormat(
+            formattedInput->uuid,
+            String(SLAVE_ECHO),
+            "");
+        this->send(*echoReply, false, false);
+        logMaster(String(formattedInput->messageLength) + " " + formattedInput->action + "-" + formattedInput->instructions);
+        delete echoReply;
+    }
+
+    switch (action)
+    {
+    case SLAVE_LOGIN:
+    {
+        logSlave("Slave chip logged in");
+        this->startPings();
+        break;
+    }
     case SLAVE_ECHO:
     {
         this->echos->verifyEcho(formattedInput->uuid);
@@ -334,6 +366,7 @@ Slave::Slave()
     using namespace std::placeholders;
     this->bindedSender = std::bind(static_cast<bool (Slave::*)(String, bool, bool)>(&Slave::send), this, _1, _2, _3);
 
+    this->pingsStarted = false;
     this->lastPingMillis = 0;
     this->pong = false;
     this->droppedPings = 0;
@@ -341,13 +374,16 @@ Slave::Slave()
     this->taskManager = NULL;
 };
 
-bool Slave::init(HardwareSerial *serialPort, Status *context)
+bool Slave::init(HardwareSerial *ss, Status *context)
 {
-    this->ss = serialPort;
+    this->ss = ss;
     this->ss->end();
     this->ss->begin(DEFAULT_SERIAL_BAUD_RATE);
     logMaster("Slave serial started. Baud " + String(DEFAULT_SERIAL_BAUD_RATE));
     this->statusInstance = context;
+
+    // get slave to reset to login
+    this->resetSlave();
 
     this->taskManager = new Task(this->statusInstance);
     return true;
@@ -360,6 +396,7 @@ void Slave::setWcsInstance(WCS *context)
 
 void Slave::run()
 {
+
     // check for slave chip message
     if (this->serialRead())
         this->handleSerialInput();

@@ -3,6 +3,8 @@
 #ifndef SLAVECONSTANTS_H
 #define SLAVECONSTANTS_H
 
+#include "Helpers/Local/LocalHelper.h"
+
 namespace SlaveConstants
 {
     extern const int DEFAULT_SERIAL_BAUD_RATE;
@@ -10,7 +12,9 @@ namespace SlaveConstants
     // actions
     enum ENUM_SLAVE_ACTIONS
     {
-        SLAVE_ECHO = 0,
+        SLAVE_LOGIN = 0,
+        SLAVE_RESET,
+        SLAVE_ECHO,
         LOG,
         LOGERROR,
         SLAVE_PING,
@@ -43,7 +47,7 @@ namespace SlaveConstants
     extern const int MAX_BINSLOT;
 
     // pings
-    extern const unsigned long SLAVE_PING_INTERVAL;        // 10s
+    extern const unsigned long SLAVE_PING_INTERVAL;         // 10s
     extern const unsigned long SLAVE_PING_DROPPED_DURATION; // 1s after sending out ping
     extern const unsigned int SLAVE_MAX_DROPPED_PINGS;
 
@@ -61,9 +65,11 @@ namespace SlaveConstants
         SlaveCommsFormat(String uuid, String act, String inst)
         {
             this->uuid = uuid;
-            this->action = act;
+            this->action = GET_TWO_DIGIT_STRING(act);
             this->instructions = inst;
-            this->messageLength = this->action.length() + BODY_DELIMITER.length() + this->instructions.length();
+            this->messageLength = this->action.length();
+            if (this->instructions.length() > 0)
+                this->messageLength += BODY_DELIMITER.length() + this->instructions.length();
         };
         SlaveCommsFormat(String act, String inst) : SlaveCommsFormat(String(millis()), act, inst){};
         SlaveCommsFormat(){};

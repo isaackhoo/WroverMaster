@@ -3,7 +3,7 @@
 // ---------------------------
 // Echo Constants Declaration
 // ---------------------------
-const unsigned int EchoConstants::DEFAULT_ECHO_TIMEOUT = 1000;
+const unsigned int EchoConstants::DEFAULT_ECHO_TIMEOUT = 1000 * 5;
 const unsigned int EchoConstants::DEFAULT_MAX_DROPS = 3;
 
 // ---------------------------

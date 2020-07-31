@@ -34,6 +34,7 @@ private:
     Echo *echos;
     SenderFunction bindedSender;
 
+    bool pingsStarted;
     bool pong;
     bool pongChecked;
     unsigned int lastPingMillis;
@@ -55,6 +56,8 @@ private:
     void runPing();
     void startPings();
     void updatePingReceived();
+
+    void resetSlave();
 
     SlaveCommsFormat *interpret(String);
     void perform(SlaveCommsFormat *);
