@@ -41,6 +41,7 @@ void SlaveComms::init(String uuid, ENUM_SLAVE_ACTIONS action, String inst)
     this->uuid = uuid;
     this->action = action;
     this->instructions = inst;
+    this->msgLength = 0;
 
     // calculate message length
     this->msgLength += DEFAULT_ENUM_VALUE_LENGTH;
@@ -202,7 +203,9 @@ void Slave::onStoreBin(String inst){
 
 void Slave::onMove(String inst)
 {
-    log("in slave on move");
+    log("sending to slave chip");
+    SlaveComms testmove(MOVETO, inst);
+    this->send(testmove);
 };
 
 void Slave::onBattery(){
@@ -286,8 +289,8 @@ bool Slave::serialRead()
 void Slave::extractSerialInput()
 {
     // input details are stored within TCP
-    int sohIdx = this->serialIn.indexOf(STX);
-    int eotIdx = this->serialIn.indexOf(ETX);
+    int sohIdx = this->serialIn.indexOf(SOH);
+    int eotIdx = this->serialIn.indexOf(EOT);
 
     while (eotIdx >= 0 && eotIdx > sohIdx)
     {
@@ -306,8 +309,8 @@ void Slave::extractSerialInput()
         // check for more inputs
         if (this->serialIn.length() > 0)
         {
-            sohIdx = this->serialIn.indexOf(STX);
-            eotIdx = this->serialIn.indexOf(ETX);
+            sohIdx = this->serialIn.indexOf(SOH);
+            eotIdx = this->serialIn.indexOf(EOT);
         }
         else
         {
@@ -435,6 +438,9 @@ void Slave::perform(SlaveComms input)
 
 void Slave::runPing()
 {
+    if (!this->isSerialConnected)
+        return;
+
     unsigned int currentMillis = millis();
 
     // check if pings have stopped
