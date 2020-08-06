@@ -5,7 +5,7 @@
 .vscode/ipch
 
 #Keys
-/src/Network/NetworkKeys.cpp
+/src/Wifi/WifiKeys.cpp
 
 #linecount
 /out
