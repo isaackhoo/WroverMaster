@@ -150,6 +150,14 @@ void EchoBroker::removeCurrentDroppedNode()
     }
 };
 
+void EchoBroker::reset()
+{
+    while (this->HEAD != NULL)
+        this->removeNode(this->HEAD);
+    while (this->DroppedHead != NULL)
+        this->removeCurrentDroppedNode();
+};
+
 // ---------------------------------
 // Echo Private Methods
 // ---------------------------------
@@ -208,12 +216,4 @@ void EchoBroker::removeNode(EchoNode *iter)
     // move tail pointer
     if (iter == this->TAIL)
         this->TAIL = iter->prev;
-};
-
-void EchoBroker::reset()
-{
-    while (this->HEAD != NULL)
-        this->removeNode(this->HEAD);
-    while (this->DroppedHead != NULL)
-        this->removeNode(this->DroppedHead);
 };

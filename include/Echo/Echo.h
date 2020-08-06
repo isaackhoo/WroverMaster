@@ -37,6 +37,7 @@ public:
     int getEchoCount();
     EchoNode *getNextDroppedNode();
     void removeCurrentDroppedNode();
+    void reset();
 
 private:
     EchoNode *HEAD;
@@ -54,7 +55,6 @@ private:
     void addPendingNode(EchoNode *);
     void addDroppedNode(EchoNode *);
     void removeNode(EchoNode *);
-    void reset();
 };
 
 #endif

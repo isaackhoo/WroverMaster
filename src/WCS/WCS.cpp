@@ -408,53 +408,62 @@ void WCS::perform(WcsComms input)
     }
     case SET:
     {
-        // recLog += "MANUAL_SET";
-        // // interpret manual set instructions
-        // String manualSetAction = formattedInput->instructions.substring(0, DEFAULT_ENUM_VALUE_LENGTH);
-        // String manualInstructions = formattedInput->instructions.substring(DEFAULT_ENUM_VALUE_LENGTH + 1);
-        // ENUM_MANUAL_SET_TYPES manualAction = (ENUM_MANUAL_SET_TYPES)manualSetAction.toInt();
-        // switch (manualAction)
-        // {
-        // case MANUAL_SET_DEFAULT:
-        // {
-        //     // set status to chip defaults, but do not save
-        //     this->statusInstance->setDefault();
-        //     break;
-        // }
-        // case MANUAL_SET_ID:
-        // {
-        //     this->statusInstance->setId(manualInstructions);
-        //     this->statusInstance->saveStatus();
-        //     additionalLogs = "[Manual] ID updated to " + manualInstructions;
-        //     break;
-        // }
-        // case MANUAL_SET_LEVEL:
-        // {
-        //     this->statusInstance->setLevel(manualInstructions);
-        //     this->statusInstance->saveStatus();
-        //     additionalLogs = "[Manual] Level updated to " + manualInstructions;
-        //     break;
-        // }
-        // case MANUAL_SET_STATE:
-        // {
-        //     this->statusInstance->setState((ENUM_SHUTTLE_STATE)manualInstructions.toInt());
-        //     this->statusInstance->saveStatus();
-        //     additionalLogs = String("[Manual] Shuttle State updated to ") + String(SHUTTLE_STATE_STRING[manualInstructions.toInt()]);
-        //     break;
-        // }
-        // case MANUAL_SET_ECHO:
-        // {
-        //     this->echos->reset();
-        //     additionalLogs = "[Manual] Echos reset";
-        //     break;
-        // }
-        // default:
-        // {
-        //     recLog += "Failed to determine action";
-        //     break;
-        // }
-        // }
-        // break;
+        // interpret manual set instructions
+
+        ENUM_MANUAL_SET_TYPES manualAction = (ENUM_MANUAL_SET_TYPES)input.getInstructions().substring(0, DEFAULT_ENUM_VALUE_LENGTH).toInt();
+        String manualInstructions((char *)0);
+        manualInstructions.reserve(16);
+        manualInstructions = input.getInstructions().substring(DEFAULT_ENUM_VALUE_LENGTH + 1);
+
+        String manualSetLog((char *)0);
+        manualSetLog.reserve(64);
+
+        // determine manual switch action to perform
+        switch (manualAction)
+        {
+        case MANUAL_SET_DEFAULT:
+        {
+            // not in use
+            break;
+        }
+        case MANUAL_SET_ID:
+        {
+            Status::setId(manualInstructions);
+            Status::saveStatus();
+            manualSetLog += F("[Manual] Id set to ");
+            manualSetLog += Status::getId();
+            break;
+        }
+        case MANUAL_SET_LEVEL:
+        {
+            Status::setLevel(manualInstructions);
+            Status::saveStatus();
+            manualSetLog += F("[Manual] Level set to ");
+            manualSetLog += Status::getLevel();
+            break;
+        }
+        case MANUAL_SET_STATE:
+        {
+            Status::setState((StatusConstants::ENUM_SHUTTLE_STATE)manualInstructions.toInt());
+            Status::saveStatus();
+            manualSetLog += F("[Manual] State set to ");
+            manualSetLog += Status::getStateString();
+            break;
+        }
+        case MANUAL_SET_ECHO:
+        {
+            this->echoBroker.reset();
+            manualSetLog += F("[Manual] Echos reset");
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+
+        log(manualSetLog);
+        break;
     }
     case ECHO:
     {

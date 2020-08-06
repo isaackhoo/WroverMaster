@@ -21,6 +21,7 @@ namespace Status
     void saveStatus();
 
     // setters
+    bool setId(String);
     bool setLevel(String);
     bool setActionEnum(ENUM_WCS_ACTIONS);
     bool setInstructions(String);

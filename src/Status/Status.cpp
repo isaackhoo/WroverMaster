@@ -34,10 +34,6 @@ namespace Status
     // ---------------------------
     // STATUS PRIVATE METHODS
     // ---------------------------
-    void setId(String id)
-    {
-        _id = id;
-    };
 
     // ---------------------------
     // STATUS PUBLIC VARIABLES
@@ -46,6 +42,12 @@ namespace Status
     // ---------------------------
     // STATUS PUBLIC METHODS
     // ---------------------------
+    bool setId(String id)
+    {
+        _id = id;
+        return true;
+    };
+
     bool init()
     {
         _id.reserve(5);
