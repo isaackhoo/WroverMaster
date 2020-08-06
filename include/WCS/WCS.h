@@ -12,10 +12,14 @@
 #include "WCS/TCP/TCP.h"
 #include "Echo/Echo.h"
 #include "ESPWrover/ESPWrover.h"
+#include "Slave/Slave.h"
 
 using namespace WcsConstants;
 using namespace ControlCharacters;
 using namespace Helper;
+
+// forward declaration
+class Slave;
 
 class WcsComms
 {
@@ -39,16 +43,13 @@ class WCS
 public:
     WCS();
     bool init();
+    void setSlaveInstance(Slave *);
     void run();
 
-    bool send(String, bool, bool, unsigned int);
-    bool send(String, bool, bool);
-    bool send(WcsComms, bool, bool);
-    bool send(WcsComms, bool);
-    bool send(WcsComms);
     void loginToServer();
 
 private:
+    Slave *slaveInstance;
     EchoBroker echoBroker;
     bool pong;
     bool pongChecked;
@@ -56,6 +57,12 @@ private:
     unsigned int droppedPings;
 
 private:
+    bool send(String, bool, bool, unsigned int);
+    bool send(String, bool, bool);
+    bool send(WcsComms, bool, bool);
+    bool send(WcsComms, bool);
+    bool send(WcsComms);
+
     void pingServer();
     void runPing();
     void startPings();

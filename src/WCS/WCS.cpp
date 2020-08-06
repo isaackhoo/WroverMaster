@@ -85,6 +85,9 @@ bool WCS::init()
 {
     bool res;
 
+    // nullify pointers
+    this->slaveInstance = NULL;
+
     // init echos
     this->echoBroker.init(1000 * 5, 3);
 
@@ -96,6 +99,11 @@ bool WCS::init()
     this->loginToServer();
 
     return res;
+};
+
+void WCS::setSlaveInstance(Slave *context)
+{
+    this->slaveInstance = context;
 };
 
 void WCS::run()
@@ -116,7 +124,8 @@ void WCS::run()
         {
             // resend the dropped echo
             EchoNode *echo = this->echoBroker.getNextDroppedNode();
-            this->send(echo->getMessage(), false, true, echo->dropped);
+            if (echo != NULL)
+                this->send(echo->getMessage(), false, true, echo->dropped);
 
             // remove dropped node
             this->echoBroker.removeCurrentDroppedNode();
@@ -134,6 +143,26 @@ void WCS::run()
     }
 };
 
+void WCS::loginToServer()
+{
+    String loginDetails((char *)0);
+    loginDetails.reserve(8);
+
+    loginDetails += GET_TWO_DIGIT_STRING(Status::getLevel());
+    loginDetails += GET_TWO_DIGIT_STRING(Status::getState());
+
+    WcsComms loginMsg(LOGIN, loginDetails);
+
+    this->send(loginMsg, false, false);
+};
+
+// -----------------------------------
+// WCS PRIVATE VARIABLES
+// -----------------------------------
+
+// -----------------------------------
+// WCS PRIVATE METHODS
+// -----------------------------------
 bool WCS::send(String toSend, bool shouldLog, bool awaitEcho, unsigned int retries)
 {
     bool res = TCP::TcpWrite(toSend);
@@ -145,7 +174,7 @@ bool WCS::send(String toSend, bool shouldLog, bool awaitEcho, unsigned int retri
         sendLog.reserve(128);
 
         if (!res)
-            sendLog += "Failed to send to server";
+            sendLog += F("Failed to send to server");
         else
         {
             sendLog += "<< ";
@@ -189,26 +218,6 @@ bool WCS::send(WcsComms c)
     return this->send(c, true);
 };
 
-void WCS::loginToServer()
-{
-    String loginDetails((char *)0);
-    loginDetails.reserve(8);
-
-    loginDetails += GET_TWO_DIGIT_STRING(Status::getLevel());
-    loginDetails += GET_TWO_DIGIT_STRING(Status::getState());
-
-    WcsComms loginMsg(LOGIN, loginDetails);
-
-    this->send(loginMsg, false, false);
-};
-
-// -----------------------------------
-// WCS PRIVATE VARIABLES
-// -----------------------------------
-
-// -----------------------------------
-// WCS PRIVATE METHODS
-// -----------------------------------
 void WCS::pingServer()
 {
     WcsComms pingServer(PING, "");
@@ -378,21 +387,29 @@ void WCS::perform(WcsComms input)
     case RETRIEVEBIN:
     {
         // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onRetrieveBin(input.getInstructions());
         break;
     }
     case STOREBIN:
     {
         // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onStoreBin(input.getInstructions());
         break;
     }
     case MOVE:
     {
         // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onMove(input.getInstructions());
         break;
     }
     case BATTERY:
     {
         // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onBattery();
         break;
     }
     case STATE:
