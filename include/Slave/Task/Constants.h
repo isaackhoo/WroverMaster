@@ -47,8 +47,8 @@ namespace TaskConstants
     // Movememnt
     enum ENUM_MOVEMENT_DIRECTION
     {
-        FORWARD = -1,
-        REVERSE = 1,
+        FORWARD = 1,
+        REVERSE = -1,
         Num_Movement_Directions = 2
     };
     const String EnumMovementDirectionString[(int)Num_Movement_Directions] = {
