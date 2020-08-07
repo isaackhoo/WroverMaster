@@ -332,7 +332,6 @@ SlaveComms Slave::interpret(String input)
 
     int headerDeliIdx = input.indexOf(HEADER_DELIMITER);
     int stxIdx = input.indexOf(STX, headerDeliIdx + 1);
-    int bdyDeliIdx = input.indexOf(BODY_DELIMITER, stxIdx + 1); // can be -1
     int etxIdx = input.indexOf(ETX, stxIdx + 1);
 
     String uuid((char *)0);
@@ -354,6 +353,7 @@ SlaveComms Slave::interpret(String input)
     }
     else
     {
+        int bdyDeliIdx = message.indexOf(BODY_DELIMITER); // can be -1
         String actionStr((char *)0);
         actionStr.reserve(3);
         actionStr += bdyDeliIdx > 0 ? message.substring(0, bdyDeliIdx) : message;
@@ -376,7 +376,7 @@ void Slave::perform(SlaveComms input)
         SlaveComms echo(input.getUuid(), SLAVE_ECHO, "");
         this->send(echo, false, false);
 
-        if (input.getAction() != LOG && input.getAction() != LOGERROR)
+        if (input.getAction() != LOG && input.getAction() != LOGERROR && input.getAction() != SLAVE_ERROR)
         {
             // log input
             String received((char *)0);
@@ -429,6 +429,14 @@ void Slave::perform(SlaveComms input)
     case RETRACT_FINGER_PAIR:
     {
         // pass all these actions to its corresponding step to handle
+        log("received reply");
+        log(String(input.getAction()));
+        log(input.getInstructions());
+        break;
+    }
+    case SLAVE_ERROR:
+    {
+        logError(input.getInstructions());
         break;
     }
     default:
