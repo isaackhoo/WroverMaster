@@ -29,6 +29,7 @@ namespace Status
     bool setState(ENUM_SHUTTLE_STATE);
     bool setSlothole(String);
     void setTask(ENUM_WCS_ACTIONS, String);
+    void clearTask();
     void clearNotification(); 
     
     // getters

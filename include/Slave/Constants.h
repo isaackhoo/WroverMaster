@@ -59,18 +59,7 @@ namespace SlaveConstants
 
         "SLAVE_BATTERY",
         "SLAVE_ERROR",
-    };
-
-    // instructions
-    extern const int INST_RACK_ID_LEN;
-    extern const int INST_COL_ID_LEN;
-    extern const int INST_BINPOS_LEN;
-
-    // rack setup
-    extern const int MIN_COLUMN;
-    extern const int MAX_COLUMN;
-    extern const int MIN_BINSLOT;
-    extern const int MAX_BINSLOT;
+    }; 
 
     // pings
     extern const unsigned long SLAVE_PING_INTERVAL;

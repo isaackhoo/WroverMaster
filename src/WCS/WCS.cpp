@@ -156,6 +156,16 @@ void WCS::loginToServer()
     this->send(loginMsg, false, false);
 };
 
+void WCS::notifyTaskCompletion()
+{
+    WcsComms completionComms((ENUM_WCS_ACTIONS)Status::getActionEnum().toInt(), "");
+    this->send(completionComms);
+
+    // update shuttle status
+    Status::clearTask();
+    Status::setState(IDLE);
+};
+
 // -----------------------------------
 // WCS PRIVATE VARIABLES
 // -----------------------------------

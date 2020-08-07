@@ -4,23 +4,12 @@ namespace SlaveConstants
 {
     const int DEFAULT_SERIAL_BAUD_RATE = 115200;
 
-    // instructions
-    const int INST_RACK_ID_LEN = 2;
-    const int INST_COL_ID_LEN = 2;
-    const int INST_BINPOS_LEN = 2;
-
-    // rack setup
-    const int MIN_COLUMN = -2;
-    const int MAX_COLUMN = 20;
-    const int MIN_BINSLOT = 1;
-    const int MAX_BINSLOT = 12;
-
     // pings
     const unsigned long SLAVE_PING_INTERVAL = 1000 * 35; // allows up to 3 retries
 
     // serial communications
     const String HEADER_DELIMITER(F(","));
-    const String BODY_DELIMITER(F("-"));
+    const String BODY_DELIMITER(F("_"));
 }; // namespace SlaveConstants
 
 // ----------------------------------------- SLAVECOMMS -----------------------------------------
@@ -151,6 +140,9 @@ bool Slave::init(HardwareSerial *ss)
     this->isSerialConnected = false;
     this->lastSerialPingMillis = 0;
 
+    // initialize task manager
+    this->taskManager.init();
+
     // initialize echos
     this->echoBroker.init(1000 * 5, 3);
     // set serial and begin
@@ -193,19 +185,22 @@ void Slave::run()
     }
 };
 
-void Slave::onRetrieveBin(String inst){
-
+void Slave::onRetrieveBin(String inst)
+{
+    this->taskManager.createRetrievalTask(inst);
+    this->startTask();
 };
 
-void Slave::onStoreBin(String inst){
-
+void Slave::onStoreBin(String inst)
+{
+    this->taskManager.createStorageTask(inst);
+    this->startTask();
 };
 
 void Slave::onMove(String inst)
 {
-    log("sending to slave chip");
-    SlaveComms testmove(MOVETO, inst);
-    this->send(testmove);
+    this->taskManager.createMovementTask(inst);
+    this->startTask();
 };
 
 void Slave::onBattery(){
@@ -221,6 +216,12 @@ void Slave::onBattery(){
 // -------------------------------
 bool Slave::send(String toSend, bool shouldLog, bool awaitEcho, unsigned int retries)
 {
+    if (!this->isSerialConnected)
+    {
+        logError(F("Slavechip is not logged in"));
+        return false;
+    }
+
     bool res = this->ss->print(toSend);
 
     // check if should log
@@ -273,6 +274,15 @@ bool Slave::send(SlaveComms c, bool sl)
 bool Slave::send(SlaveComms c)
 {
     return this->send(c, true);
+};
+
+bool Slave::send(Step *step)
+{
+    if (step == NULL)
+        return false;
+
+    SlaveComms stepInstructions(step->getStepAction(), String(step->getStepTarget()));
+    return this->send(stepInstructions);
 };
 
 bool Slave::serialRead()
@@ -413,6 +423,9 @@ void Slave::perform(SlaveComms input)
     }
     case SLAVE_PING:
     {
+        if (!this->isSerialConnected)
+            break;
+
         this->lastSerialPingMillis = millis();
         // reply ping
         SlaveComms pingReply(SLAVE_PING, "");
@@ -422,16 +435,48 @@ void Slave::perform(SlaveComms input)
     case ENGAGE_ESTOP:
     case DISENGAGE_ESTOP:
     case MOVETO:
-    // case READ_BIN_SENSOR:
+    case READ_BIN_SENSOR:
     case EXTEND_ARM:
     case HOME_ARM:
     case EXTEND_FINGER_PAIR:
     case RETRACT_FINGER_PAIR:
     {
-        // pass all these actions to its corresponding step to handle
-        log("received reply");
-        log(String(input.getAction()));
-        log(input.getInstructions());
+        // let task manager handle
+        Step *next = this->taskManager.validateCurrentStep(input.getInstructions());
+        if (next == NULL)
+        {
+            // overall task is complete
+            logSlave(F("Task completed"));
+            // notify server task completion
+            if (this->wcsInstance != NULL)
+                this->wcsInstance->notifyTaskCompletion();
+        }
+        // has more task to perform
+        else
+        {
+            switch (next->getStepStatus())
+            {
+            case STEP_ERROR:
+            {
+                logSlaveError(next->getStepErrorDetails());
+                break;
+            }
+            case STEP_ACTIVE:
+            {
+                this->send(next);
+                break;
+            }
+            default:
+            {
+                logError(F("Invalid step status encountered"));
+                break;
+            }
+            }
+        }
+        break;
+    }
+    case SLAVE_BATTERY:
+    {
         break;
     }
     case SLAVE_ERROR:
@@ -458,4 +503,9 @@ void Slave::runPing()
         logSlaveError(F("Pings from slave chip stopped"));
         this->isSerialConnected = false;
     };
+};
+
+void Slave::startTask()
+{
+    this->send(this->taskManager.begin());
 };

@@ -9,9 +9,13 @@
 #include "Echo/Echo.h"
 #include "Logger/Logger.h"
 #include "ControlCharacters/ControlCharacters.h"
+#include "Slave/Task/Task.h"
+#include "Slave/Step/Step.h"
+#include "Slave/Step/Constants.h"
 
 using namespace SlaveConstants;
 using namespace ControlCharacters;
+using namespace StepConstants;
 
 // forward declaration
 class WCS;
@@ -61,6 +65,7 @@ private:
     bool isSerialConnected;
     unsigned int lastSerialPingMillis;
 
+    Task taskManager;
 
 private:
     bool send(String, bool, bool, unsigned int);
@@ -68,6 +73,7 @@ private:
     bool send(SlaveComms, bool, bool);
     bool send(SlaveComms, bool);
     bool send(SlaveComms);
+    bool send(Step *);
 
     bool serialRead();
     void extractSerialInput();
@@ -75,6 +81,8 @@ private:
     void perform(SlaveComms);
 
     void runPing();
+
+    void startTask();
 };
 
 #endif

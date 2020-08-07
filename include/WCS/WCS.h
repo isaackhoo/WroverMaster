@@ -47,6 +47,7 @@ public:
     void run();
 
     void loginToServer();
+    void notifyTaskCompletion();
 
 private:
     Slave *slaveInstance;
