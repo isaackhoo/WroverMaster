@@ -23,4 +23,22 @@ namespace Helper
     {
         return GET_TWO_DIGIT_STRING(str.toInt());
     };
+
+    String GEN_UUID()
+    {
+        String uuid((char *)0);
+        uuid.reserve(8);
+
+        randomSeed(millis());
+
+        for (int i = 0; i < 5; ++i)
+        {
+            byte randVal = random(0, 35);
+            char letter = randVal + 'a';
+            if (randVal > 25)
+                letter = (randVal - 26) + '0';
+            uuid += letter;
+        }
+        return uuid;
+    };
 }; // namespace Helper

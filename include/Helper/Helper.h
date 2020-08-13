@@ -13,6 +13,8 @@ namespace Helper
     extern String GET_TWO_DIGIT_STRING(int);
     extern String GET_TWO_DIGIT_STRING(char *);
     extern String GET_TWO_DIGIT_STRING(String);
+
+    extern String GEN_UUID();
 }; // namespace Helper
 
 #endif

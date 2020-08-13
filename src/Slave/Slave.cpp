@@ -23,7 +23,7 @@ SlaveComms::SlaveComms(String u, ENUM_SLAVE_ACTIONS a, String i)
     this->init(u, a, i);
 };
 
-SlaveComms::SlaveComms(ENUM_SLAVE_ACTIONS a, String i) : SlaveComms(String(millis()), a, i){};
+SlaveComms::SlaveComms(ENUM_SLAVE_ACTIONS a, String i) : SlaveComms(GEN_UUID(), a, i){};
 
 void SlaveComms::init(String uuid, ENUM_SLAVE_ACTIONS action, String inst)
 {
@@ -43,7 +43,7 @@ void SlaveComms::init(String uuid, ENUM_SLAVE_ACTIONS action, String inst)
 
 void SlaveComms::init(ENUM_SLAVE_ACTIONS a, String i)
 {
-    this->init(String(millis()), a, i);
+    this->init(GEN_UUID(), a, i);
 };
 
 String SlaveComms::toString(bool includeBoundingControlChars)
@@ -216,11 +216,11 @@ void Slave::onBattery(){
 // -------------------------------
 bool Slave::send(String toSend, bool shouldLog, bool awaitEcho, unsigned int retries)
 {
-    if (!this->isSerialConnected)
-    {
-        logError(F("Slavechip is not logged in"));
-        return false;
-    }
+    // if (!this->isSerialConnected)
+    // {
+    //     logError(F("Slavechip is not logged in"));
+    //     return false;
+    // }
 
     bool res = this->ss->print(toSend);
 
@@ -404,6 +404,14 @@ void Slave::perform(SlaveComms input)
     {
         this->isSerialConnected = true;
         logSlave(F("Slave chip logged in"));
+
+        // reset ping millis
+        this->lastSerialPingMillis = millis();
+
+        // reply to slave chip that login is successful
+        SlaveComms loginSuccess(SLAVE_LOGIN, "");
+        this->send(loginSuccess, true, false);
+
         break;
     }
     case SLAVE_ECHO:
