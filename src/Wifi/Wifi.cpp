@@ -1,6 +1,5 @@
 #include "Wifi/Wifi.h"
 
-
 namespace Wifi
 {
     // --------------------------------

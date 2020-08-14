@@ -6,6 +6,7 @@
 
 #Keys
 /src/Wifi/WifiKeys.cpp
+/src/WCS/TCP/TCPKeys.cpp
 
 #linecount
 /out

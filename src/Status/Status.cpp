@@ -8,7 +8,7 @@ namespace StatusConstants
     const int DEFAULT_LEVEL_MIN = 1;
     const int DEFAULT_LEVEL_MAX = 21;
     const String DEFAULT_LEVEL(F("02"));
-    const int DEFAULT_SLOTHOLE_MIN = -2;
+    const int DEFAULT_SLOTHOLE_MIN = -3;
     const int DEFAULT_SLOTHOLE_MAX = 119;
     const String DEFAULT_SLOTHOLE(F("0"));
     const String DEFAULT_STATUS_DELIMITER(F(","));

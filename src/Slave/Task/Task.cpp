@@ -297,6 +297,9 @@ void Task::reset()
 // micro tasks
 Step *Task::moveTo(String slothole)
 {
+    Logger::log(slothole);
+    Logger::log(String(slothole.toDouble())); 
+
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // creates and returns loose pointers
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -9,6 +9,7 @@
 #include "Slave/Step/Constants.h"
 #include "Status/Status.h"
 #include "Status/Constants.h"
+#include "Logger/Logger.h"
 
 using namespace TaskConstants;
 using namespace StepConstants;
