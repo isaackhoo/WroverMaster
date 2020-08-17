@@ -410,8 +410,11 @@ void Slave::perform(SlaveComms input)
         // reset ping millis
         this->lastSerialPingMillis = millis();
 
+        // provide slave with current slothole information
+        String currentSlothole = GET_TWO_DIGIT_STRING(Status::getSlothole());
+
         // reply to slave chip that login is successful
-        SlaveComms loginSuccess(SLAVE_LOGIN, "");
+        SlaveComms loginSuccess(SLAVE_LOGIN, currentSlothole);
         this->send(loginSuccess, true, false);
 
         break;
@@ -481,6 +484,23 @@ void Slave::perform(SlaveComms input)
                 logError(F("Invalid step status encountered"));
                 break;
             }
+            }
+        }
+
+        // update current slothole
+        if (input.getAction() == MOVETO)
+        {
+            if (next != NULL && next->getStepAction() == MOVETO)
+            {
+                // failed to complete movement
+                break;
+            }
+            else
+            {
+                // successfully completed movement step
+                // update status with current slothole
+                Status::setSlothole(input.getInstructions());
+                Status::saveStatus();
             }
         }
         break;
