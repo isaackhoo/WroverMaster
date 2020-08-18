@@ -150,6 +150,10 @@ bool Slave::init(HardwareSerial *ss)
     this->ss->end();
     this->ss->begin(DEFAULT_SERIAL_BAUD_RATE);
 
+    // to remove
+    Status::setSlothole("0");
+    Status::saveStatus();
+
     return res;
 };
 
