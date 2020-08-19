@@ -16,6 +16,7 @@ void setup()
   // init status
   initializationRes = Status::init();
 
+  Logger::log("Connecting to " + Wifi::ssid);
   // connect wifi
   initializationRes = Wifi::ConnectWifi();
   if (!initializationRes)
@@ -26,10 +27,11 @@ void setup()
   // init slave
   initializationRes = slave.init(&Serial);
   if (!initializationRes)
-    Logger::log("Failed to initialize slave");
+    Logger::log("Failed to initialize slave-master");
   else
-    Logger::log("Slave initialized");
+    Logger::log("Slave-master initialized");
 
+  Logger::log("Connect to server " + TCP::serverIp + ":" + String(TCP::serverPort));
   // init wcs
   initializationRes = wcs.init();
   if (!initializationRes)
