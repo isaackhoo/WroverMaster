@@ -203,8 +203,6 @@ void Slave::onStoreBin(String inst)
 
 void Slave::onMove(String inst)
 {
-    Logger::log("in slave onMove");
-    Logger::log(inst);
     this->taskManager.createMovementTask(inst);
     this->startTask();
 };

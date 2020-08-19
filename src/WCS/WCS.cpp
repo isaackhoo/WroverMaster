@@ -254,7 +254,7 @@ void WCS::runPing()
                     ++this->droppedPings;
                 else
                 {
-                    log(F("Max pings dropped. Resetting chip"));
+                    Logger::logWcsError(F("Max pings dropped. Resetting chip"));
                     ESPWrover::reset();
                 }
             }
