@@ -34,6 +34,7 @@ namespace SlaveConstants
 
         SLAVE_BATTERY, // 14
         SLAVE_ERROR, // 15
+        UPDATE_SLOTHOLE, // 16
         Num_Slave_Actions_Enums
     };
     const String EnumSlaveActionsString[(int)Num_Slave_Actions_Enums] = {

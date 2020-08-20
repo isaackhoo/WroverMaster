@@ -189,6 +189,12 @@ void Slave::run()
     }
 };
 
+void Slave::updateSlothole()
+{
+    SlaveComms updateSlothole = SlaveComms(UPDATE_SLOTHOLE, Status::getSlothole());
+    this->send(updateSlothole);
+};
+
 void Slave::onRetrieveBin(String inst)
 {
     this->taskManager.createRetrievalTask(inst);

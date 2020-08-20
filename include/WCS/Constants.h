@@ -50,7 +50,8 @@ namespace WcsConstants
         MANUAL_SET_ID,    // 01
         MANUAL_SET_LEVEL, // 02
         MANUAL_SET_STATE, // 03
-        MANUAL_SET_ECHO,  // 04
+        MANUAL_SET_SLOTHOLE, // 04
+        MANUAL_SET_ECHO,  // 05
         Num_Of_Manual_Set_Types_Enums
     };
     const String EnumWcsManulSetString[(int)Num_Of_Manual_Set_Types_Enums] = {
@@ -58,7 +59,8 @@ namespace WcsConstants
         "MANUAL_SET_ID",    // 01
         "MANUAL_SET_LEVEL", // 02
         "MANUAL_SET_STATE", // 03
-        "MANUAL_SET_ECHO",  // 04
+        "MANUAL_SET_SLOTHOLE", // 04
+        "MANUAL_SET_ECHO",  // 05
     };
 }; // namespace WcsConstants
 

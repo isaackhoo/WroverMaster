@@ -477,6 +477,18 @@ void WCS::perform(WcsComms input)
             manualSetLog += Status::getStateString();
             break;
         }
+        case MANUAL_SET_SLOTHOLE:
+        {
+            Status::setSlothole(manualInstructions);
+            Status::saveStatus();
+            manualSetLog += F("[Manual] Slothole set to ");
+            manualSetLog += manualInstructions;
+
+            // update slave chip that slothole has been changed
+            if (this->slaveInstance != NULL)
+                this->slaveInstance->updateSlothole();
+            break;
+        }
         case MANUAL_SET_ECHO:
         {
             this->echoBroker.reset();

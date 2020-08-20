@@ -51,6 +51,8 @@ public:
     void setWcsInstance(WCS *);
     void run();
 
+    void updateSlothole();
+
     void onRetrieveBin(String);
     void onStoreBin(String);
     void onMove(String);
