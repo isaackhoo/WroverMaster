@@ -3,6 +3,7 @@
 #include "Status/Status.h"
 #include "WCS/WCS.h"
 #include "Slave/Slave.h"
+#include "ESPWrover/ESPWrover.h"
 
 Slave slave;
 WCS wcs;
@@ -44,8 +45,11 @@ void setup()
   wcs.setSlaveInstance(&slave);
 
   if (!initializationRes)
-    while (true)
-      ;
+  {
+    Logger::log("Resetting chip");
+    delay(2000);
+    ESPWrover::reset();
+  }
   else
     Logger::logInitSuccess();
 }

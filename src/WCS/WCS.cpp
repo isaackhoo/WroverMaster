@@ -440,7 +440,7 @@ void WCS::perform(WcsComms input)
         ENUM_MANUAL_SET_TYPES manualAction = (ENUM_MANUAL_SET_TYPES)input.getInstructions().substring(0, DEFAULT_ENUM_VALUE_LENGTH).toInt();
         String manualInstructions((char *)0);
         manualInstructions.reserve(16);
-        manualInstructions = input.getInstructions().substring(DEFAULT_ENUM_VALUE_LENGTH + 1);
+        manualInstructions = input.getInstructions().substring(DEFAULT_ENUM_VALUE_LENGTH);
 
         String manualSetLog((char *)0);
         manualSetLog.reserve(64);

@@ -221,6 +221,9 @@ Step *Task::begin()
 
 Step *Task::validateCurrentStep(String val)
 {
+    if (this->iterator == NULL)
+        return NULL;
+
     bool res = this->iterator->validate(val);
     if (res)
     {
@@ -305,6 +308,9 @@ Step *Task::moveTo(String slothole)
     // determine if move task should include the use of estop
     if ((ENUM_AMOVE_SLOTHOLE)Status::getSlothole().toInt() == SLOTHOLE_IN_LIFTER || (ENUM_AMOVE_SLOTHOLE)slothole.toInt() == SLOTHOLE_IN_LIFTER)
         useEStop = true;
+
+    // TODO :: remove
+    useEStop = false;
 
     Step *retractEstop = useEStop ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT) : NULL;
     Step *move = new Step(MOVETO, slothole.toDouble());
