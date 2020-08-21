@@ -23,6 +23,7 @@ public:
 public:
     Step();
     Step(ENUM_SLAVE_ACTIONS, double, double, String);
+    Step(ENUM_SLAVE_ACTIONS, double, double);
     Step(ENUM_SLAVE_ACTIONS, double, String);
     Step(ENUM_SLAVE_ACTIONS, double);
 

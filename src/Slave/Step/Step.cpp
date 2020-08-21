@@ -26,6 +26,8 @@ Step::Step(ENUM_SLAVE_ACTIONS action, double target, double deviation, String in
 
 Step::Step(ENUM_SLAVE_ACTIONS a, double t, String i) : Step(a, t, 0, i){};
 
+Step::Step(ENUM_SLAVE_ACTIONS a, double t, double d) : Step(a, t, d, ""){};
+
 Step::Step(ENUM_SLAVE_ACTIONS a, double t) : Step(a, t, ""){};
 
 // setters

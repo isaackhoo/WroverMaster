@@ -5,6 +5,8 @@
 
 #include <Arduino.h>
 
+#define ARM_EXTENSION_TOLERANCE 5
+
 namespace TaskConstants
 {
     // Arm
@@ -24,12 +26,9 @@ namespace TaskConstants
         FIRST_DEPTH = 642,
         SECOND_DEPTH = 1185,
         BUFFER_DEPTH = 900,
-        Num_Extension_Depths = 3
-    };
-    const String EnumExtensionDepthString[(int)Num_Extension_Depths] = {
-        "FIRST_DEPTH",
-        "SECOND_DEPTH",
-        "BUFFER_DEPTH",
+        OFFSET = 30,
+        HOME_DEPTH = 0,
+        Num_Extension_Depths = 4
     };
 
     // E-Stop

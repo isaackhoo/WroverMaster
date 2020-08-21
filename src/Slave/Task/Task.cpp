@@ -330,9 +330,9 @@ Step *Task::receiveBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // creates and returns loose pointers
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    Step *init = new Step(EXTEND_ARM, depth * direction);
+    Step *init = new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE);
     Step *next = this->concatSteps(init, new Step(EXTEND_FINGER_PAIR, direction));
-    next = this->concatSteps(next, new Step(HOME_ARM, 0));
+    next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
     next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, direction));
 
     return init;
@@ -346,9 +346,9 @@ Step *Task::releaseBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     double reverse = -1;
 
     Step *init = new Step(EXTEND_FINGER_PAIR, reverse * direction);
-    Step *next = this->concatSteps(init, new Step(EXTEND_ARM, depth * direction));
+    Step *next = this->concatSteps(init, new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE));
     next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, reverse * direction));
-    next = this->concatSteps(next, new Step(HOME_ARM, 0));
+    next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
 
     return init;
 };
