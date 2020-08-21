@@ -330,8 +330,18 @@ Step *Task::receiveBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // creates and returns loose pointers
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    Step *init = new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE);
-    Step *next = this->concatSteps(init, new Step(EXTEND_FINGER_PAIR, direction));
+    double reverse = -1;
+
+    // check if bin is in slot
+    Step *init = new Step(READ_BIN_SENSOR, this->determineBinSensingDepth(depth) * direction, this->determineBinSensingDeviation(depth));
+    // extend arm and finger
+    Step *next = this->concatSteps(init, new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE));
+    next = this->concatSteps(next, new Step(EXTEND_FINGER_PAIR, direction));
+    // offset retrieval to prevent finger jam
+    next = this->concatSteps(next, new Step(EXTEND_ARM, reverse * direction * OFFSET, ARM_EXTENSION_TOLERANCE));
+    // check that bin slot is now empty - bin has been successfully retrieved
+    next = this->concatSteps(next, new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction));
+    // home arm
     next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
     next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, direction));
 
@@ -345,10 +355,75 @@ Step *Task::releaseBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     double reverse = -1;
 
-    Step *init = new Step(EXTEND_FINGER_PAIR, reverse * direction);
-    Step *next = this->concatSteps(init, new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE));
+    // check that bin exist at slot
+    Step *init = new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction);
+    // extend fingers and arm to release bin
+    Step *next = this->concatSteps(init, new Step(EXTEND_FINGER_PAIR, reverse * direction));
+    next = this->concatSteps(next, new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE));
+    // check that bin is in place
+    next = this->concatSteps(next, new Step(READ_BIN_SENSOR, this->determineBinSensingDepth(depth) * direction, this->determineBinSensingDeviation(depth)));
+    // home arm
     next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, reverse * direction));
     next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
 
     return init;
+};
+
+int Task::determineBinSensingDepth(ENUM_EXTENSION_DEPTH depth)
+{
+    int expectedScanValue = 0;
+    switch (depth)
+    {
+    case BUFFER_DEPTH:
+    {
+        expectedScanValue = BS_DEPTH_BUFFER;
+        break;
+    }
+    case FIRST_DEPTH:
+    {
+        expectedScanValue = BS_DEPTH_FIRST;
+        break;
+    }
+    case SECOND_DEPTH:
+    {
+        expectedScanValue = BS_DEPTH_SECOND;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return expectedScanValue;
+};
+
+int Task::determineBinSensingDeviation(ENUM_EXTENSION_DEPTH depth)
+{
+    int expectedStdDev = 0;
+    switch (depth)
+    {
+    case BUFFER_DEPTH:
+    {
+        expectedStdDev = BS_SD_BUFFER;
+        break;
+    }
+    case FIRST_DEPTH:
+    {
+        expectedStdDev = BS_SD_FIRST;
+        break;
+    }
+    case SECOND_DEPTH:
+    {
+        expectedStdDev = BS_SD_SECOND;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return expectedStdDev;
+};
+
+int Task::determineEmptyBinSlotSensing(ENUM_EXTENSION_DEPTH depth)
+{
+    return this->determineBinSensingDepth(depth) + this->determineBinSensingDeviation(depth);
 };

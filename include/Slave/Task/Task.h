@@ -69,6 +69,9 @@ private:
     Step *moveTo(String);
     Step *receiveBin(ENUM_EXTENSION_DEPTH, ENUM_EXTENSION_DIRECTION);
     Step *releaseBin(ENUM_EXTENSION_DEPTH, ENUM_EXTENSION_DIRECTION);
+    int determineBinSensingDepth(ENUM_EXTENSION_DEPTH);
+    int determineBinSensingDeviation(ENUM_EXTENSION_DEPTH);
+    int determineEmptyBinSlotSensing(ENUM_EXTENSION_DEPTH);
 };
 
 #endif
