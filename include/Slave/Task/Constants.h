@@ -34,16 +34,16 @@ namespace TaskConstants
     // Bin sensor
     enum ENUM_BIN_SENSOR_DISTANCES
     {
-        BS_DEPTH_BUFFER = 1,
-        BS_DEPTH_FIRST = 2,
-        BS_DEPTH_SECOND = 3,
+        BS_DEPTH_BUFFER = 50,
+        BS_DEPTH_FIRST = 30,
+        BS_DEPTH_SECOND = 105,
     };
 
     enum ENUM_BIN_SENSOR_DEVIATION
     {
-        BS_SD_BUFFER = 1,
-        BS_SD_FIRST = 2,
-        BS_SD_SECOND = 2,
+        BS_SD_BUFFER = 10,
+        BS_SD_FIRST = 10,
+        BS_SD_SECOND = 15,
     };
 
     // E-Stop
