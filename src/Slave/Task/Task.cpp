@@ -195,16 +195,15 @@ bool Task::createMovementTask(String slothole)
 
 bool Task::createBufferTransferTask(String fromBuffer)
 {
-    int fromBufferInt = fromBuffer.toInt();
-    if (fromBufferInt != LEFT && fromBufferInt != RIGHT)
+    ENUM_EXTENSION_DIRECTION fromDirection = (ENUM_EXTENSION_DIRECTION)fromBuffer.toInt();
+    if (fromDirection != LEFT && fromDirection != RIGHT)
         return false;
 
-    ENUM_EXTENSION_DIRECTION from = (ENUM_EXTENSION_DIRECTION)fromBufferInt;
-    ENUM_EXTENSION_DIRECTION to = from == LEFT ? RIGHT : LEFT;
+    ENUM_EXTENSION_DIRECTION to = fromDirection == LEFT ? RIGHT : LEFT;
 
     // create transfer task
     this->reset();
-    this->appendToList(this->receiveBin(BUFFER_DEPTH, from));
+    this->appendToList(this->receiveBin(BUFFER_DEPTH, fromDirection));
     this->appendToList(this->releaseBin(BUFFER_DEPTH, to));
 
     return true;
@@ -240,6 +239,15 @@ Step *Task::validateCurrentStep(String val)
         this->iterator = this->iterator->next;
         if (this->iterator != NULL)
             this->iterator->setStatus(STEP_ACTIVE);
+    }
+    else
+    {
+        this->iterator->incrementRetries();
+        if (this->iterator->getCurrentRetries() >= this->iterator->getMaxRetries())
+        {
+            this->iterator->setStatus(ENUM_STEP_STATUS::STEP_ERROR);
+            this->iterator->setErrorDetails("Max step retries reached");
+        }
     }
 
     return this->iterator;
@@ -339,11 +347,11 @@ Step *Task::receiveBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     next = this->concatSteps(next, new Step(EXTEND_FINGER_PAIR, direction));
     // offset retrieval to prevent finger jam
     next = this->concatSteps(next, new Step(EXTEND_ARM, reverse * direction * OFFSET, ARM_EXTENSION_TOLERANCE));
-    // check that bin slot is now empty - bin has been successfully retrieved
-    next = this->concatSteps(next, new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction));
     // home arm
     next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
     next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, direction));
+    // check that bin slot is now empty - bin has been successfully retrieved
+    next = this->concatSteps(next, new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction, this->getComparisonType(direction)));
 
     return init;
 };
@@ -355,16 +363,16 @@ Step *Task::releaseBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     double reverse = -1;
 
-    // check that bin exist at slot
-    Step *init = new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction);
+    // check that no bin exist at slot
+    Step *init = new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction, this->getComparisonType(direction));
     // extend fingers and arm to release bin
     Step *next = this->concatSteps(init, new Step(EXTEND_FINGER_PAIR, reverse * direction));
     next = this->concatSteps(next, new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE));
+    // home arm
+    next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
+    next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, reverse * direction));
     // check that bin is in place
     next = this->concatSteps(next, new Step(READ_BIN_SENSOR, this->determineBinSensingDepth(depth) * direction, this->determineBinSensingDeviation(depth)));
-    // home arm
-    next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, reverse * direction));
-    next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
 
     return init;
 };
@@ -426,4 +434,27 @@ int Task::determineBinSensingDeviation(ENUM_EXTENSION_DEPTH depth)
 int Task::determineEmptyBinSlotSensing(ENUM_EXTENSION_DEPTH depth)
 {
     return this->determineBinSensingDepth(depth) + this->determineBinSensingDeviation(depth);
+};
+
+ENUM_COMPARISON_TYPE Task::getComparisonType(ENUM_EXTENSION_DIRECTION direction)
+{
+    ENUM_COMPARISON_TYPE cmpType = CMP_DEFAULT;
+
+    switch (direction)
+    {
+    case LEFT:
+    {
+        cmpType = CMP_LESS_THAN;
+        break;
+    }
+    case RIGHT:
+    {
+        cmpType = CMP_GREATER_THAN;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return cmpType;
 };

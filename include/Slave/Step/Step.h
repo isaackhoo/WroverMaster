@@ -8,6 +8,7 @@
 #include "Slave/Constants.h"
 #include "Helper/Helper.h"
 #include "ControlCharacters/ControlCharacters.h"
+#include "Logger/Logger.h"
 
 using namespace StepConstants;
 using namespace SlaveConstants;
@@ -22,13 +23,20 @@ public:
 
 public:
     Step();
-    Step(ENUM_SLAVE_ACTIONS, double, double, String);
-    Step(ENUM_SLAVE_ACTIONS, double, double);
+    Step(ENUM_SLAVE_ACTIONS, double, double, String, ENUM_COMPARISON_TYPE, unsigned int);
+    Step(ENUM_SLAVE_ACTIONS, double, double, String, ENUM_COMPARISON_TYPE);
     Step(ENUM_SLAVE_ACTIONS, double, String);
+    Step(ENUM_SLAVE_ACTIONS, double, double, ENUM_COMPARISON_TYPE, unsigned int);
+    Step(ENUM_SLAVE_ACTIONS, double, double, ENUM_COMPARISON_TYPE);
+    Step(ENUM_SLAVE_ACTIONS, double, double);
+    Step(ENUM_SLAVE_ACTIONS, double, ENUM_COMPARISON_TYPE, unsigned int);
+    Step(ENUM_SLAVE_ACTIONS, double, ENUM_COMPARISON_TYPE);
     Step(ENUM_SLAVE_ACTIONS, double);
 
     // setters
     bool setStatus(ENUM_STEP_STATUS);
+
+    unsigned int incrementRetries();
     bool setErrorDetails(String);
 
     // getters
@@ -37,6 +45,9 @@ public:
     double getStepTarget();
     double getStepFixedDeviation();
     String getStepInstructions();
+
+    unsigned int getMaxRetries();
+    unsigned int getCurrentRetries();
     String getStepErrorDetails();
 
     String toString();
@@ -51,7 +62,10 @@ private:
     double stepTarget;
     double fixedDeviation;
     String instructions;
+    ENUM_COMPARISON_TYPE cmpType;
 
+    unsigned int maxRetries;
+    unsigned int retries;
     String errorDetails;
 };
 

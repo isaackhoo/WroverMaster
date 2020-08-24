@@ -26,6 +26,9 @@ namespace TaskConstants
         FIRST_DEPTH = 642,
         SECOND_DEPTH = 1185,
         BUFFER_DEPTH = 900,
+        // FIRST_DEPTH = 100,
+        // SECOND_DEPTH = 500,
+        // BUFFER_DEPTH = 300,
         OFFSET = 30,
         HOME_DEPTH = 0,
         Num_Extension_Depths = 4

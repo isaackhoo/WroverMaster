@@ -56,6 +56,7 @@ public:
     void onRetrieveBin(String);
     void onStoreBin(String);
     void onMove(String);
+    void onBufferTransfer(String);
     void onBattery();
 
 private:

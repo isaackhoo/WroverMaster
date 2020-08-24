@@ -25,7 +25,8 @@ namespace WcsConstants
         LEVEL,       // 9
         SET,         // 10
         ECHO,        // 11
-        ERROR,       // 12
+        TRANSFER,    // 12
+        ERROR,       // 13
         Num_Of_WCS_Action_Enums
     };
     const String EnumWcsActionString[(int)Num_Of_WCS_Action_Enums] = {
@@ -41,26 +42,27 @@ namespace WcsConstants
         "LEVEL",       // 9
         "SET",         // 10
         "ECHO",        // 11
-        "ERROR",       // 12
+        "TRASNFER",    // 12
+        "ERROR",       // 13
     };
 
     enum ENUM_MANUAL_SET_TYPES
     {
         MANUAL_SET_DEFAULT = 0,
-        MANUAL_SET_ID,    // 01
-        MANUAL_SET_LEVEL, // 02
-        MANUAL_SET_STATE, // 03
+        MANUAL_SET_ID,       // 01
+        MANUAL_SET_LEVEL,    // 02
+        MANUAL_SET_STATE,    // 03
         MANUAL_SET_SLOTHOLE, // 04
-        MANUAL_SET_ECHO,  // 05
+        MANUAL_SET_ECHO,     // 05
         Num_Of_Manual_Set_Types_Enums
     };
     const String EnumWcsManulSetString[(int)Num_Of_Manual_Set_Types_Enums] = {
         "MANUAL_SET_DEFAULT",
-        "MANUAL_SET_ID",    // 01
-        "MANUAL_SET_LEVEL", // 02
-        "MANUAL_SET_STATE", // 03
+        "MANUAL_SET_ID",       // 01
+        "MANUAL_SET_LEVEL",    // 02
+        "MANUAL_SET_STATE",    // 03
         "MANUAL_SET_SLOTHOLE", // 04
-        "MANUAL_SET_ECHO",  // 05
+        "MANUAL_SET_ECHO",     // 05
     };
 }; // namespace WcsConstants
 

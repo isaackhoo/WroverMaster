@@ -509,6 +509,12 @@ void WCS::perform(WcsComms input)
         this->echoBroker.verify(input.getInstructions());
         break;
     }
+    case TRANSFER:
+    {
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onBufferTransfer(input.getInstructions());
+        break;
+    }
     case ERROR:
     {
         // do nothing. not in use

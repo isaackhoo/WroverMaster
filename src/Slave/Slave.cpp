@@ -213,6 +213,16 @@ void Slave::onMove(String inst)
     this->startTask();
 };
 
+void Slave::onBufferTransfer(String from)
+{
+    ENUM_EXTENSION_DIRECTION fromDirection = (ENUM_EXTENSION_DIRECTION)from.toInt();
+    if (fromDirection != LEFT && fromDirection != RIGHT)
+        return;
+
+    this->taskManager.createBufferTransferTask(from);
+    this->startTask();
+};
+
 void Slave::onBattery(){
 
 };

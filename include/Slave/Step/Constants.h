@@ -5,6 +5,8 @@
 
 #include <Arduino.h>
 
+#define DEFAULT_MAX_RETRIES 10
+
 namespace StepConstants
 {
     enum ENUM_STEP_STATUS
@@ -21,6 +23,14 @@ namespace StepConstants
         "STEP_COMPLETED", // 2
         "STEP_ERROR",     // 3
     };
+
+    enum ENUM_COMPARISON_TYPE
+    {
+        CMP_DEFAULT = 0,
+        CMP_GREATER_THAN,
+        CMP_LESS_THAN
+    };
+
 }; // namespace StepConstants
 
 #endif

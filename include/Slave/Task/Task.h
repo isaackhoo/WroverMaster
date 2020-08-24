@@ -72,6 +72,7 @@ private:
     int determineBinSensingDepth(ENUM_EXTENSION_DEPTH);
     int determineBinSensingDeviation(ENUM_EXTENSION_DEPTH);
     int determineEmptyBinSlotSensing(ENUM_EXTENSION_DEPTH);
+    ENUM_COMPARISON_TYPE getComparisonType(ENUM_EXTENSION_DIRECTION);
 };
 
 #endif
