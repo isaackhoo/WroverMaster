@@ -352,7 +352,7 @@ WcsComms WCS::interpret(String input)
 void WCS::perform(WcsComms input)
 {
     // update status
-    if (input.getActionEnum() == RETRIEVEBIN || input.getActionEnum() == STOREBIN || input.getActionEnum() == MOVE)
+    if (input.getActionEnum() == RETRIEVEBIN || input.getActionEnum() == STOREBIN || input.getActionEnum() == MOVE || input.getActionEnum() == TRANSFER)
     {
         Status::setTask(input.getActionEnum(), input.getInstructions());
     };
@@ -504,17 +504,19 @@ void WCS::perform(WcsComms input)
         log(manualSetLog);
         break;
     }
+    case TRANSFER:
+    {
+        // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onBufferTransfer(input.getInstructions());
+        break;
+    }
     case ECHO:
     {
         this->echoBroker.verify(input.getInstructions());
         break;
     }
-    case TRANSFER:
-    {
-        if (this->slaveInstance != NULL)
-            this->slaveInstance->onBufferTransfer(input.getInstructions());
-        break;
-    }
+
     case ERROR:
     {
         // do nothing. not in use
