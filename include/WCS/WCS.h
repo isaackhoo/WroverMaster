@@ -48,6 +48,7 @@ public:
 
     void loginToServer();
     void notifyTaskCompletion();
+    void updateBatteryLevel(String);
 
 private:
     Slave *slaveInstance;

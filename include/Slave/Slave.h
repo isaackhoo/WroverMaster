@@ -57,7 +57,6 @@ public:
     void onStoreBin(String);
     void onMove(String);
     void onBufferTransfer(String);
-    void onBattery();
 
 private:
     HardwareSerial *ss;
@@ -69,6 +68,7 @@ private:
     unsigned int lastSerialPingMillis;
 
     Task taskManager;
+    unsigned int lastBatteryReqMillis;
 
 private:
     bool send(String, bool, bool, unsigned int);

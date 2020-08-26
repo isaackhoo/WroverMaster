@@ -5,6 +5,8 @@
 
 #include <Arduino.h>
 
+#define BATTERY_REQ_INTERVAL 60000 // 1 min
+
 namespace SlaveConstants
 {
     extern const int DEFAULT_SERIAL_BAUD_RATE;

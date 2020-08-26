@@ -166,6 +166,12 @@ void WCS::notifyTaskCompletion()
     Status::setState(IDLE);
 };
 
+void WCS::updateBatteryLevel(String battery)
+{
+    WcsComms batteryUpdate(ENUM_WCS_ACTIONS::BATTERY, battery);
+    this->send(batteryUpdate);
+};
+
 // -----------------------------------
 // WCS PRIVATE VARIABLES
 // -----------------------------------
@@ -352,7 +358,7 @@ WcsComms WCS::interpret(String input)
 void WCS::perform(WcsComms input)
 {
     // update status
-    if (input.getActionEnum() == RETRIEVEBIN || input.getActionEnum() == STOREBIN || input.getActionEnum() == MOVE || input.getActionEnum() == TRANSFER)
+    if (input.getActionEnum() == RETRIEVEBIN || input.getActionEnum() == STOREBIN || input.getActionEnum() == MOVE || input.getActionEnum() == BUFFER_TRANSFER)
     {
         Status::setTask(input.getActionEnum(), input.getInstructions());
     };
@@ -415,13 +421,13 @@ void WCS::perform(WcsComms input)
             this->slaveInstance->onMove(input.getInstructions());
         break;
     }
-    case BATTERY:
-    {
-        // hand over control to slave handler
-        if (this->slaveInstance != NULL)
-            this->slaveInstance->onBattery();
-        break;
-    }
+    // case BATTERY:
+    // {
+    //     // hand over control to slave handler
+    //     if (this->slaveInstance != NULL)
+    //         this->slaveInstance->onBattery();
+    //     break;
+    // }
     case STATE:
     {
         // do nothing for now. not in use
@@ -504,7 +510,7 @@ void WCS::perform(WcsComms input)
         log(manualSetLog);
         break;
     }
-    case TRANSFER:
+    case BUFFER_TRANSFER:
     {
         // hand over control to slave handler
         if (this->slaveInstance != NULL)

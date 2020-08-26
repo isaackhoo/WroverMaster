@@ -150,9 +150,8 @@ bool Slave::init(HardwareSerial *ss)
     this->ss->end();
     this->ss->begin(DEFAULT_SERIAL_BAUD_RATE);
 
-    // to remove
-    Status::setSlothole("0");
-    Status::saveStatus();
+    // battery
+    this->lastBatteryReqMillis = 0;
 
     return res;
 };
@@ -186,6 +185,14 @@ void Slave::run()
             // remove dropped node
             this->echoBroker.removeCurrentDroppedNode();
         }
+    }
+
+    // check for battery level
+    if (millis() - this->lastBatteryReqMillis >= BATTERY_REQ_INTERVAL)
+    {
+        this->lastBatteryReqMillis = millis();
+        SlaveComms batteryReq = SlaveComms(ENUM_SLAVE_ACTIONS::SLAVE_BATTERY, "");
+        this->send(batteryReq);
     }
 };
 
@@ -221,10 +228,6 @@ void Slave::onBufferTransfer(String from)
 
     this->taskManager.createBufferTransferTask(from);
     this->startTask();
-};
-
-void Slave::onBattery(){
-
 };
 
 // -------------------------------
@@ -525,6 +528,12 @@ void Slave::perform(SlaveComms input)
     }
     case SLAVE_BATTERY:
     {
+        // received battery percentage feedback
+        double batteryPerc = input.getInstructions().toInt() / 10;
+        Logger::log("Battery %: " + String(batteryPerc));
+        // update master battery
+        if (this->wcsInstance != NULL)
+            this->wcsInstance->updateBatteryLevel(input.getInstructions());
         break;
     }
     case SLAVE_ERROR:

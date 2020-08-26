@@ -25,7 +25,7 @@ namespace WcsConstants
         LEVEL,       // 9
         SET,         // 10
         ECHO,        // 11
-        TRANSFER,    // 12
+        BUFFER_TRANSFER,    // 12
         ERROR,       // 13
         Num_Of_WCS_Action_Enums
     };
@@ -42,7 +42,7 @@ namespace WcsConstants
         "LEVEL",       // 9
         "SET",         // 10
         "ECHO",        // 11
-        "TRASNFER",    // 12
+        "BUFFER_TRANSFER",    // 12
         "ERROR",       // 13
     };
 
