@@ -317,14 +317,11 @@ Step *Task::moveTo(String slothole)
     if ((ENUM_AMOVE_SLOTHOLE)Status::getSlothole().toInt() == SLOTHOLE_IN_LIFTER || (ENUM_AMOVE_SLOTHOLE)slothole.toInt() == SLOTHOLE_IN_LIFTER)
         useEStop = true;
 
-    // TODO :: remove
-    useEStop = false;
-
-    Step *retractEstop = useEStop ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT) : NULL;
+    Step *retractEstop = useEStop ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT, ESTOP_DEVIATION) : NULL;
     Step *move = new Step(MOVETO, slothole.toDouble());
     if (useEStop)
         this->concatSteps(retractEstop, move);
-    Step *extendEstop = useEStop ? new Step(ENGAGE_ESTOP, ESTOP_EXTEND) : NULL;
+    Step *extendEstop = useEStop ? new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION) : NULL;
     if (useEStop)
         this->concatSteps(move, extendEstop);
 

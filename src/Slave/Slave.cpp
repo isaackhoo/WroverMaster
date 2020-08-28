@@ -139,6 +139,7 @@ bool Slave::init(HardwareSerial *ss)
     // default pings
     this->isSerialConnected = false;
     this->lastSerialPingMillis = 0;
+    this->lastSlaveResetMillis = 0;
 
     // initialize task manager
     this->taskManager.init();
@@ -163,6 +164,14 @@ void Slave::setWcsInstance(WCS *context)
 
 void Slave::run()
 {
+    // // if slave chip is not logged in, try to get it to reset
+    // if (!this->isSerialConnected && millis() - this->lastSlaveResetMillis >= SLAVE_CHIP_RESET_INTERVAL)
+    // {
+    //     this->lastSlaveResetMillis = millis();
+    //     SlaveComms resetInst(SLAVE_RESET, "");
+    //     this->send(resetInst, true, false);
+    // }
+
     // check for slave chip message
     if (this->serialRead())
         this->extractSerialInput();
@@ -483,7 +492,10 @@ void Slave::perform(SlaveComms input)
             logSlave(F("Task completed"));
             // notify server task completion
             if (this->wcsInstance != NULL)
-                this->wcsInstance->notifyTaskCompletion();
+            {
+                Logger::log("status instructions " + Status::getInstructions());
+                this->wcsInstance->notifyTaskCompletion(Status::getInstructions());
+            }
         }
         // has more task to perform
         else
@@ -529,7 +541,7 @@ void Slave::perform(SlaveComms input)
     case SLAVE_BATTERY:
     {
         // received battery percentage feedback
-        double batteryPerc = input.getInstructions().toInt() / 10;
+        double batteryPerc = input.getInstructions().toDouble() / 10.0;
         Logger::log("Battery %: " + String(batteryPerc));
         // update master battery
         if (this->wcsInstance != NULL)

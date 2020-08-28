@@ -52,13 +52,10 @@ namespace TaskConstants
     // E-Stop
     enum ENUM_ESTOP_EXTENSION
     {
-        ESTOP_EXTEND = 1,
-        ESTOP_RETRACT = 0,
+        ESTOP_EXTEND = 635,
+        ESTOP_RETRACT = 30,
+        ESTOP_DEVIATION = 10,
         Num_Estop_Extensions = 2
-    };
-    const String EnumEstopExtensionsString[(int)Num_Estop_Extensions] = {
-        "ESTOP_EXTEND",
-        "ESTOP_RETRACT",
     };
 
     // Movememnt

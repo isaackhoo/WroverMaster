@@ -87,6 +87,7 @@ bool WCS::init()
 
     // nullify pointers
     this->slaveInstance = NULL;
+    this->completionNotification = NULL;
 
     // init echos
     this->echoBroker.init(1000 * 5, 3);
@@ -140,6 +141,14 @@ void WCS::run()
 
         // turn off toggle
         Status::clearNotification();
+    };
+
+    // check if there is task completion to notify server
+    if (this->completionNotification != NULL)
+    {
+        this->send(*this->completionNotification);
+        delete this->completionNotification;
+        this->completionNotification = NULL;
     }
 };
 
@@ -156,14 +165,21 @@ void WCS::loginToServer()
     this->send(loginMsg, false, false);
 };
 
+void WCS::notifyTaskCompletion(String feedback)
+{
+    // set shuttle status idle
+    Status::setState(IDLE);
+
+    // update that task is complete
+    this->completionNotification = new WcsComms((ENUM_WCS_ACTIONS)Status::getActionEnum().toInt(), feedback);
+
+    // remove shuttle task
+    Status::clearTask();
+};
+
 void WCS::notifyTaskCompletion()
 {
-    WcsComms completionComms((ENUM_WCS_ACTIONS)Status::getActionEnum().toInt(), "");
-    this->send(completionComms);
-
-    // update shuttle status
-    Status::clearTask();
-    Status::setState(IDLE);
+    this->notifyTaskCompletion("");
 };
 
 void WCS::updateBatteryLevel(String battery)

@@ -5,6 +5,8 @@
 
 #include <Arduino.h>
 
+#define SLAVE_CHIP_RESET_INTERVAL 10000 
+
 #define BATTERY_REQ_INTERVAL 60000 // 1 min
 
 namespace SlaveConstants

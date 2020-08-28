@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 
-#define DEFAULT_MAX_RETRIES 10
+#define DEFAULT_MAX_RETRIES 100
 
 namespace StepConstants
 {

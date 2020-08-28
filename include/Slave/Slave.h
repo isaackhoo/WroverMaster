@@ -66,6 +66,7 @@ private:
     String serialIn;
     bool isSerialConnected;
     unsigned int lastSerialPingMillis;
+    unsigned int lastSlaveResetMillis;
 
     Task taskManager;
     unsigned int lastBatteryReqMillis;

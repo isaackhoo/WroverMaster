@@ -47,6 +47,7 @@ public:
     void run();
 
     void loginToServer();
+    void notifyTaskCompletion(String);
     void notifyTaskCompletion();
     void updateBatteryLevel(String);
 
@@ -57,6 +58,8 @@ private:
     bool pongChecked;
     unsigned int lastPingMillis;
     unsigned int droppedPings;
+
+    WcsComms *completionNotification;
 
 private:
     bool send(String, bool, bool, unsigned int);
