@@ -504,6 +504,7 @@ void Slave::perform(SlaveComms input)
             {
             case STEP_ERROR:
             {
+                Logger::log("entered step error case");
                 logSlaveError(next->getStepErrorDetails());
                 break;
             }
