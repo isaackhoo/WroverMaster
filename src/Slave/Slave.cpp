@@ -134,7 +134,7 @@ bool Slave::init(HardwareSerial *ss)
     this->wcsInstance = NULL;
 
     // reserve string space
-    this->serialIn.reserve(256);
+    this->serialIn.reserve(1032);
 
     // default pings
     this->isSerialConnected = false;
@@ -201,7 +201,7 @@ void Slave::run()
     {
         this->lastBatteryReqMillis = millis();
         SlaveComms batteryReq = SlaveComms(ENUM_SLAVE_ACTIONS::SLAVE_BATTERY, "");
-        this->send(batteryReq);
+        this->send(batteryReq, false);
     }
 };
 
