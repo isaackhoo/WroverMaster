@@ -28,8 +28,6 @@ namespace SDCard
     // -----------------------------
     bool createDir(const char *path)
     {
-        if (!isInit)
-            return false;
         if (SD_MMC.mkdir(path))
             return true;
         else
@@ -38,8 +36,6 @@ namespace SDCard
 
     bool removeDir(const char *path)
     {
-        if (!isInit)
-            return false;
         if (SD_MMC.rmdir(path))
             return true;
         else
