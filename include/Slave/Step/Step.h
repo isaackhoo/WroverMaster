@@ -8,7 +8,6 @@
 #include "Slave/Constants.h"
 #include "Helper/Helper.h"
 #include "ControlCharacters/ControlCharacters.h"
-#include "Logger/Logger.h"
 
 using namespace StepConstants;
 using namespace SlaveConstants;

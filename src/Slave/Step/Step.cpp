@@ -132,9 +132,6 @@ bool Step::validate(double val)
 
 bool Step::validate(String res)
 {
-    Logger::log("validation res ");
-    Logger::log(res);
-
     if (res.startsWith(String(NAK)))
     {
         this->setStatus(STEP_ERROR);

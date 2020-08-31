@@ -164,14 +164,6 @@ void Slave::setWcsInstance(WCS *context)
 
 void Slave::run()
 {
-    // // if slave chip is not logged in, try to get it to reset
-    // if (!this->isSerialConnected && millis() - this->lastSlaveResetMillis >= SLAVE_CHIP_RESET_INTERVAL)
-    // {
-    //     this->lastSlaveResetMillis = millis();
-    //     SlaveComms resetInst(SLAVE_RESET, "");
-    //     this->send(resetInst, true, false);
-    // }
-
     // check for slave chip message
     if (this->serialRead())
         this->extractSerialInput();
@@ -542,11 +534,11 @@ void Slave::perform(SlaveComms input)
     case SLAVE_BATTERY:
     {
         // received battery percentage feedback
-        double batteryPerc = input.getInstructions().toDouble() / 10.0;
-        Logger::log("Battery %: " + String(batteryPerc));
-        // update master battery
-        if (this->wcsInstance != NULL)
-            this->wcsInstance->updateBatteryLevel(input.getInstructions());
+        // double batteryPerc = input.getInstructions().toDouble() / 10.0;
+        // Logger::log("Battery %: " + String(batteryPerc));
+        // // update master battery
+        // if (this->wcsInstance != NULL)
+        //     this->wcsInstance->updateBatteryLevel(input.getInstructions());
         break;
     }
     case SLAVE_ERROR:
