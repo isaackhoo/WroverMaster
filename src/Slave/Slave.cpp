@@ -498,6 +498,7 @@ void Slave::perform(SlaveComms input)
             {
                 Logger::log("entered step error case");
                 logSlaveError(next->getStepErrorDetails());
+                this->wcsInstance->notifyTaskFailure(String(next->getStepAction()) + "-" + next->getStepErrorDetails());
                 break;
             }
             case STEP_ACTIVE:

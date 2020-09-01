@@ -49,6 +49,7 @@ public:
     void loginToServer();
     void notifyTaskCompletion(String);
     void notifyTaskCompletion();
+    void notifyTaskFailure(String);
     void updateBatteryLevel(String);
 
 private:

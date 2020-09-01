@@ -247,7 +247,6 @@ Step *Task::validateCurrentStep(String val)
         {
             this->iterator->setStatus(ENUM_STEP_STATUS::STEP_ERROR);
             this->iterator->setErrorDetails("Max step retries reached");
-            this->iterator = NULL;
         }
     }
 

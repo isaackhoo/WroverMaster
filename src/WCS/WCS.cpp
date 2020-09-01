@@ -182,6 +182,18 @@ void WCS::notifyTaskCompletion()
     this->notifyTaskCompletion("");
 };
 
+void WCS::notifyTaskFailure(String err)
+{
+    // set shuttle status error
+    Status::setState(ENUM_SHUTTLE_STATE::SHUTTLE_ERROR);
+
+    // update that task has error
+    this->completionNotification = new WcsComms(ENUM_WCS_ACTIONS::ERROR, err);
+
+    // remove shuttle task
+    Status::clearTask();
+};
+
 void WCS::updateBatteryLevel(String battery)
 {
     WcsComms batteryUpdate(ENUM_WCS_ACTIONS::BATTERY, battery);
