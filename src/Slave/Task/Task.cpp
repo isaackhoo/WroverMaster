@@ -242,11 +242,17 @@ Step *Task::validateCurrentStep(String val)
     }
     else
     {
-        this->iterator->incrementRetries();
-        if (this->iterator->getCurrentRetries() >= this->iterator->getMaxRetries())
+        // check if step has already errored out
+        if (this->iterator->getStepStatus() != ENUM_STEP_STATUS::STEP_ERROR)
         {
-            this->iterator->setStatus(ENUM_STEP_STATUS::STEP_ERROR);
-            this->iterator->setErrorDetails("Max step retries reached");
+            // step has just sent back feedback that is out of bounds.
+            // retry step
+            this->iterator->incrementRetries();
+            if (this->iterator->getCurrentRetries() >= this->iterator->getMaxRetries())
+            {
+                this->iterator->setStatus(ENUM_STEP_STATUS::STEP_ERROR);
+                this->iterator->setErrorDetails("Max step retries reached");
+            }
         }
     }
 
