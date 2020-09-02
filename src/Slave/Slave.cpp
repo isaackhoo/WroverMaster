@@ -189,12 +189,12 @@ void Slave::run()
     }
 
     // check for battery level
-    if (millis() - this->lastBatteryReqMillis >= BATTERY_REQ_INTERVAL)
-    {
-        this->lastBatteryReqMillis = millis();
-        SlaveComms batteryReq = SlaveComms(ENUM_SLAVE_ACTIONS::SLAVE_BATTERY, "");
-        this->send(batteryReq, false);
-    }
+    // if (millis() - this->lastBatteryReqMillis >= BATTERY_REQ_INTERVAL)
+    // {
+    //     this->lastBatteryReqMillis = millis();
+    //     SlaveComms batteryReq = SlaveComms(ENUM_SLAVE_ACTIONS::SLAVE_BATTERY, "");
+    //     this->send(batteryReq, false);
+    // }
 };
 
 void Slave::updateSlothole()
