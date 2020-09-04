@@ -50,6 +50,8 @@ public:
     bool createRetrievalTask(String);
     bool createMovementTask(String);
     bool createBufferTransferTask(String);
+    bool createReceiveTask(String);
+    bool createReleaseTask(String);
 
     // step handling
     Step *begin();
@@ -73,6 +75,9 @@ private:
     int determineBinSensingDeviation(ENUM_EXTENSION_DEPTH);
     int determineEmptyBinSlotSensing(ENUM_EXTENSION_DEPTH);
     ENUM_COMPARISON_TYPE getComparisonType(ENUM_EXTENSION_DIRECTION);
+
+private:
+    int interpretWordedInstructions(String);
 };
 
 #endif

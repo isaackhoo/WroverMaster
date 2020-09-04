@@ -57,6 +57,8 @@ public:
     void onStoreBin(String);
     void onMove(String);
     void onBufferTransfer(String);
+    void onReceive(String);
+    void onRelease(String);
 
 private:
     HardwareSerial *ss;

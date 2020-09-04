@@ -231,6 +231,18 @@ void Slave::onBufferTransfer(String from)
     this->startTask();
 };
 
+void Slave::onReceive(String wordedInst)
+{
+    this->taskManager.createReceiveTask(wordedInst);
+    this->startTask();
+};
+
+void Slave::onRelease(String wordedInst)
+{
+    this->taskManager.createReleaseTask(wordedInst);
+    this->startTask();
+};
+
 // -------------------------------
 // SLAVE PRIVATE VARIABLES
 // -------------------------------

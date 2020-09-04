@@ -209,6 +209,30 @@ bool Task::createBufferTransferTask(String fromBuffer)
     return true;
 };
 
+bool Task::createReceiveTask(String wordedInst)
+{
+    int res = this->interpretWordedInstructions(wordedInst);
+    Logger::log("receive: " + String(res));
+    ENUM_EXTENSION_DIRECTION direction = res < 0 ? ENUM_EXTENSION_DIRECTION::LEFT : ENUM_EXTENSION_DIRECTION::RIGHT;
+    // create receive task
+    this->reset();
+    this->appendToList(this->receiveBin((ENUM_EXTENSION_DEPTH)abs(res), direction));
+
+    return true;
+};
+
+bool Task::createReleaseTask(String wordedInst)
+{
+    int res = this->interpretWordedInstructions(wordedInst);
+    Logger::log("release: " + String(res));
+    ENUM_EXTENSION_DIRECTION direction = res < 0 ? ENUM_EXTENSION_DIRECTION::LEFT : ENUM_EXTENSION_DIRECTION::RIGHT;
+    // create release task
+    this->reset();
+    this->appendToList(this->releaseBin((ENUM_EXTENSION_DEPTH)abs(res), direction));
+
+    return true;
+};
+
 // step handling
 Step *Task::begin()
 {
@@ -460,4 +484,37 @@ ENUM_COMPARISON_TYPE Task::getComparisonType(ENUM_EXTENSION_DIRECTION direction)
     }
 
     return cmpType;
+};
+
+int Task::interpretWordedInstructions(String wordedInst)
+{
+    Logger::log(wordedInst);
+
+    int res = 0;
+
+    // get depth
+    if (wordedInst.indexOf("buffer") >= 0 || wordedInst.indexOf("b") >= 0)
+    {
+        res = ENUM_EXTENSION_DEPTH::BUFFER_DEPTH;
+    }
+    else if (wordedInst.indexOf("first") >= 0 || wordedInst.indexOf("f") >= 0)
+    {
+        res = ENUM_EXTENSION_DEPTH::FIRST_DEPTH;
+    }
+    else if (wordedInst.indexOf("second") >= 0 || wordedInst.indexOf("s") >= 0)
+    {
+        res = ENUM_EXTENSION_DEPTH::SECOND_DEPTH;
+    };
+
+    // get direction
+    if (wordedInst.indexOf("left") >= 0 || wordedInst.indexOf("-") >= 0)
+    {
+        res *= ENUM_EXTENSION_DIRECTION::LEFT;
+    }
+    else
+    {
+        res = abs(res);
+    };
+
+    return res;
 };

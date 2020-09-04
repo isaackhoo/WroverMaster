@@ -545,6 +545,20 @@ void WCS::perform(WcsComms input)
             this->slaveInstance->onBufferTransfer(input.getInstructions());
         break;
     }
+    case RECEIVE:
+    {
+        // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onReceive(input.getInstructions());
+        break;
+    }
+    case RELEASE:
+    {
+        // hand over control to slave handler
+        if (this->slaveInstance != NULL)
+            this->slaveInstance->onRelease(input.getInstructions());
+        break;
+    }
     case ECHO:
     {
         this->echoBroker.verify(input.getInstructions());

@@ -14,36 +14,40 @@ namespace WcsConstants
     enum ENUM_WCS_ACTIONS
     {
         NONE = 0,
-        LOGIN,       // 1
-        LOGOUT,      // 2
-        PING,        // 3
-        RETRIEVEBIN, // 4
-        STOREBIN,    // 5
-        MOVE,        // 6
-        BATTERY,     // 7
-        STATE,       // 8
-        LEVEL,       // 9
-        SET,         // 10
-        ECHO,        // 11
-        BUFFER_TRANSFER,    // 12
-        ERROR,       // 13
+        LOGIN,           // 1
+        LOGOUT,          // 2
+        PING,            // 3
+        RETRIEVEBIN,     // 4
+        STOREBIN,        // 5
+        MOVE,            // 6
+        BATTERY,         // 7
+        STATE,           // 8
+        LEVEL,           // 9
+        SET,             // 10
+        ECHO,            // 11
+        BUFFER_TRANSFER, // 12
+        RECEIVE,         // 13
+        RELEASE,         // 14
+        ERROR,           // 15
         Num_Of_WCS_Action_Enums
     };
     const String EnumWcsActionString[(int)Num_Of_WCS_Action_Enums] = {
         "NONE",
-        "LOGIN",       // 1
-        "LOGOUT",      // 2
-        "PING",        // 3
-        "RETRIEVEBIN", // 4
-        "STOREBIN",    // 5
-        "MOVE",        // 6
-        "BATTERY",     // 7
-        "STATE",       // 8
-        "LEVEL",       // 9
-        "SET",         // 10
-        "ECHO",        // 11
-        "BUFFER_TRANSFER",    // 12
-        "ERROR",       // 13
+        "LOGIN",           // 1
+        "LOGOUT",          // 2
+        "PING",            // 3
+        "RETRIEVEBIN",     // 4
+        "STOREBIN",        // 5
+        "MOVE",            // 6
+        "BATTERY",         // 7
+        "STATE",           // 8
+        "LEVEL",           // 9
+        "SET",             // 10
+        "ECHO",            // 11
+        "BUFFER_TRANSFER", // 12
+        "RECEIVE",         // 13
+        "RELEASE",         // 14
+        "ERROR",           // 15
     };
 
     enum ENUM_MANUAL_SET_TYPES
