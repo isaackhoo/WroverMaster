@@ -50,7 +50,7 @@ namespace TaskConstants
     enum ENUM_ESTOP_EXTENSION
     {
         ESTOP_EXTEND = 635,
-        ESTOP_RETRACT = 30,
+        ESTOP_RETRACT = 25,
         ESTOP_DEVIATION = 10,
         Num_Estop_Extensions = 2
     };
