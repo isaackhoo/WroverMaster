@@ -348,7 +348,8 @@ Step *Task::moveTo(String slothole)
         useEStop = true;
 
     Step *retractEstop = useEStop ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT, ESTOP_DEVIATION) : NULL;
-    Step *move = new Step(MOVETO, slothole.toDouble());
+    // do not retry movement step for safety purposes. shuttle ran mad before. -.-|||
+    Step *move = new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0);
     if (useEStop)
         this->concatSteps(retractEstop, move);
     Step *extendEstop = useEStop ? new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION) : NULL;
