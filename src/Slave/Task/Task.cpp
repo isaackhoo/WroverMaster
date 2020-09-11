@@ -345,7 +345,7 @@ Step *Task::moveTo(String slothole)
 
     // determine if move task should include the use of estop
     if ((ENUM_AMOVE_SLOTHOLE)Status::getSlothole().toInt() == SLOTHOLE_IN_LIFTER || (ENUM_AMOVE_SLOTHOLE)slothole.toInt() == SLOTHOLE_IN_LIFTER)
-        useEStop = true;
+        useEStop = true; 
 
     Step *retractEstop = useEStop ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT, ESTOP_DEVIATION) : NULL;
     // do not retry movement step for safety purposes. shuttle ran mad before. -.-|||

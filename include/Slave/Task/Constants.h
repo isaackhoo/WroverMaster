@@ -26,9 +26,9 @@ namespace TaskConstants
         FIRST_DEPTH = 642,
         SECOND_DEPTH = 1185,
         BUFFER_DEPTH = 900,
-        OFFSET = 30,
+        OFFSET = 40,
         HOME_DEPTH = 0,
-        Num_Extension_Depths = 4
+        Num_Extension_Depths = 5
     };
 
     // Bin sensor
