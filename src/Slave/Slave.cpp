@@ -134,7 +134,7 @@ bool Slave::init(HardwareSerial *ss)
     this->wcsInstance = NULL;
 
     // reserve string space
-    this->serialIn.reserve(1032);
+    this->serialIn.reserve(1024);
 
     // default pings
     this->isSerialConnected = false;
@@ -325,8 +325,8 @@ bool Slave::serialRead()
 {
     if (this->ss != NULL && this->ss->available() > 0)
     {
-        serialIn += this->ss->readStringUntil(EOT);
-        serialIn += EOT;
+        this->serialIn += this->ss->readStringUntil(EOT);
+        this->serialIn += EOT;
         return true;
     };
     return false;
@@ -342,7 +342,7 @@ void Slave::extractSerialInput()
     {
         // extract input, excluding STX and ETX
         String input((char *)0);
-        input.reserve(64);
+        input.reserve(256);
         input = this->serialIn.substring(sohIdx + 1, eotIdx);
         if (eotIdx + 1 == this->serialIn.length())
             this->serialIn = "";

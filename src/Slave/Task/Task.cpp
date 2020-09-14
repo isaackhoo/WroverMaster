@@ -272,7 +272,7 @@ Step *Task::validateCurrentStep(String val)
             // step has just sent back feedback that is out of bounds.
             // retry step
             this->iterator->incrementRetries();
-            if (this->iterator->getCurrentRetries() >= this->iterator->getMaxRetries())
+            if (this->iterator->getCurrentRetries() > this->iterator->getMaxRetries())
             {
                 this->iterator->setStatus(ENUM_STEP_STATUS::STEP_ERROR);
                 this->iterator->setErrorDetails("Max step retries reached");
@@ -348,8 +348,8 @@ Step *Task::moveTo(String slothole)
         useEStop = true; 
 
     Step *retractEstop = useEStop ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT, ESTOP_DEVIATION) : NULL;
-    // do not retry movement step for safety purposes. shuttle ran mad before. -.-|||
-    Step *move = new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0);
+    // retry only once if an issue occurs. shuttle ran mad before. -.-|||
+    Step *move = new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 1);
     if (useEStop)
         this->concatSteps(retractEstop, move);
     Step *extendEstop = useEStop ? new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION) : NULL;
