@@ -408,8 +408,51 @@ SlaveComms Slave::interpret(String input)
         inst.reserve(64);
         inst += bdyDeliIdx > 0 ? message.substring(bdyDeliIdx + 1) : "";
 
-        formattedInput.init(uuid, action, inst);
-    }
+        // validate everything in the msg received
+        // if msg is invalid, just logs out error, and ignores the input.
+        bool isValid = true;
+        int i;
+
+        // validate uuid
+        for (i = 0; i < uuid.length(); ++i)
+        {
+            isValid = isalnum(uuid[i]);
+            if (!isValid)
+            {
+                formattedInput.init(SLAVE_ERROR, "Invalid uuid - " + uuid);
+                break;
+            }
+        };
+
+        // validate action Str
+        if (isValid)
+            for (i = 0; i < actionStr.length(); ++i)
+            {
+                isValid = isdigit(actionStr[i]);
+                if (!isValid)
+                {
+                    formattedInput.init(SLAVE_ERROR, "Invalid action - " + actionStr);
+                    break;
+                }
+            }
+
+        // validate inst
+        if (isValid)
+            for (i = 0; i < inst.length(); ++i)
+            {
+                isValid = isalnum(inst[i]) || ispunct(inst[i]) || isspace(inst[i]);
+                if (!isValid)
+                {
+                    formattedInput.init(SLAVE_ERROR, "Invalid inst - " + inst);
+                    break;
+                }
+            }
+
+        if (isValid)
+        {
+            formattedInput.init(uuid, action, inst);
+        }
+    } // end valid msg length
 
     return formattedInput;
 };
@@ -417,7 +460,8 @@ SlaveComms Slave::interpret(String input)
 void Slave::perform(SlaveComms input)
 {
     // echo back message to slave
-    if (input.getAction() != SLAVE_LOGIN && input.getAction() != SLAVE_PING && input.getAction() != SLAVE_ECHO)
+    if (
+        input.getAction() != SLAVE_LOGIN && input.getAction() != SLAVE_PING && input.getAction() != SLAVE_ECHO && input.getAction() != SLAVE_ERROR)
     {
         SlaveComms echo(input.getUuid(), SLAVE_ECHO, "");
         this->send(echo, false, false);
