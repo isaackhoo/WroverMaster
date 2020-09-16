@@ -285,7 +285,9 @@ void WCS::runPing()
             {
                 // ping was not replied
                 if (this->droppedPings < MAX_DROPPED_PINGS)
-                    ++this->droppedPings;
+                {
+                    this->droppedPings += 1;
+                }
                 else
                 {
                     Logger::logWcsError(F("Max pings dropped. Resetting chip"));

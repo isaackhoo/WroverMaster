@@ -146,7 +146,7 @@ namespace Status
             log(rehydrateLog);
 
             // increment extraction case
-            ++extractionCase;
+            extractionCase += 1;
             // update next token search starting position
             lastExtractionPos = delimiterIdx + 1;
             // search for next delimiter position

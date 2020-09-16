@@ -115,9 +115,9 @@ int EchoBroker::run()
             this->decrementTotalEchos();
             if (temp->dropped < this->maxDrops)
             {
-                ++temp->dropped;
+                temp->dropped += 1;
                 this->addDroppedNode(temp);
-                ++droppedEchos;
+                droppedEchos += 1;
             }
             else
             {
@@ -163,7 +163,7 @@ void EchoBroker::reset()
 // ---------------------------------
 void EchoBroker::incrementTotalEchos()
 {
-    ++this->totalEchos;
+    this->totalEchos += 1;
 };
 
 void EchoBroker::decrementTotalEchos()
