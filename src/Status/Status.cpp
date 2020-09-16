@@ -135,6 +135,7 @@ namespace Status
                 setInstructions(token);
                 rehydrateLog = F("Rehydrated instructions ");
                 rehydrateLog += getInstructions();
+                res = true;
                 break;
             }
             default:
