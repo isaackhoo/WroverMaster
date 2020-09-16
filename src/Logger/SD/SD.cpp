@@ -183,6 +183,15 @@ namespace SDCard
             // create logs directory if it does not exist
             createDir(LogsDirectory.c_str());
 
+            // check that status file exists
+            if (!SD_MMC.exists(StatusFilePath.c_str()))
+            {
+                // create status file
+                createDir(StatusDirectory.c_str());
+                // create status document
+                
+            }
+
             // indicate that SD has been initialised
             isInit = true;
         }

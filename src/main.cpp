@@ -15,34 +15,52 @@ void setup()
   initializationRes = Logger::init();
 
   // init status
-  initializationRes = Status::init();
+  if (initializationRes)
+  {
+    initializationRes = Status::init();
+    if (!initializationRes)
+    {
+      Logger::log("No status file found");
+      // create default status folder
+      Status::saveStatus();
+    };
+  }
 
-  Logger::log("Connecting to " + Wifi::ssid);
-  // connect wifi
-  initializationRes = Wifi::ConnectWifi();
-  if (!initializationRes)
-    Logger::log("Failed to connect to " + Wifi::ssid);
-  else
-    Logger::log("Wifi Connected to " + Wifi::ssid);
+  if (initializationRes)
+  {
+    // connect wifi
+    Logger::log("Connecting to " + Wifi::ssid);
+    initializationRes = Wifi::ConnectWifi();
+    if (!initializationRes)
+      Logger::log("Failed to connect to " + Wifi::ssid);
+    else
+      Logger::log("Wifi Connected to " + Wifi::ssid);
+  }
 
-  // init slave
-  initializationRes = slave.init(&Serial);
-  if (!initializationRes)
-    Logger::log("Failed to initialize slave-master");
-  else
-    Logger::log("Slave-master initialized");
+  if (initializationRes)
+  {
+    // init slave
+    initializationRes = slave.init(&Serial);
+    if (!initializationRes)
+      Logger::log("Failed to initialize slave-master");
+    else
+      Logger::log("Slave-master initialized");
 
-  Logger::log("Connect to server " + TCP::serverIp + ":" + String(TCP::serverPort));
-  // init wcs
-  initializationRes = wcs.init();
-  if (!initializationRes)
-    Logger::log("Failed to connect to " + TCP::serverIp);
-  else
-    Logger::log("Connected to " + TCP::serverIp);
+    Logger::log("Connect to server " + TCP::serverIp + ":" + String(TCP::serverPort));
+    // init wcs
+    initializationRes = wcs.init();
+    if (!initializationRes)
+      Logger::log("Failed to connect to " + TCP::serverIp);
+    else
+      Logger::log("Connected to " + TCP::serverIp);
+  }
 
-  // pass references
-  slave.setWcsInstance(&wcs);
-  wcs.setSlaveInstance(&slave);
+  if (initializationRes)
+  {
+    // pass references
+    slave.setWcsInstance(&wcs);
+    wcs.setSlaveInstance(&slave);
+  }
 
   if (!initializationRes)
   {
