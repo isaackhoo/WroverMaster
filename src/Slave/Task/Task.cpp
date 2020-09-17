@@ -341,30 +341,31 @@ Step *Task::moveTo(String slothole)
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // creates and returns loose pointers
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    bool useEStop = false;
+    // bool useEStop = false;
 
-    // determine if move task should include the use of estop
-    if ((ENUM_AMOVE_SLOTHOLE)Status::getSlothole().toInt() == SLOTHOLE_IN_LIFTER || (ENUM_AMOVE_SLOTHOLE)slothole.toInt() == SLOTHOLE_IN_LIFTER)
-        useEStop = true;
+    // // determine if move task should include the use of estop
+    // if ((ENUM_AMOVE_SLOTHOLE)Status::getSlothole().toInt() == SLOTHOLE_IN_LIFTER || (ENUM_AMOVE_SLOTHOLE)slothole.toInt() == SLOTHOLE_IN_LIFTER)
+    //     useEStop = true;
 
-    Step *positionEstop = useEStop
-                              ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT, ESTOP_DEVIATION)
-                              : new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION);
-    // ensure arm is homed
-    Step *next = this->concatSteps(positionEstop, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
-    // DO NOT ALLOW RETRY..fucking hell. shuttle ran mad before, and took out an Estop barrier -.-|||
-    next = this->concatSteps(next, new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0));
-    Step *extendEstop = useEStop
-                            ? new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION)
-                            : NULL;
-    if (useEStop)
-        this->concatSteps(next, extendEstop);
+    // Step *positionEstop = useEStop
+    //                           ? new Step(DISENGAGE_ESTOP, ESTOP_RETRACT, ESTOP_DEVIATION)
+    //                           : new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION);
+    // // ensure arm is homed
+    // Step *next = this->concatSteps(positionEstop, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
+    // // DO NOT ALLOW RETRY..fucking hell. shuttle ran mad before, and took out an Estop barrier -.-|||
+    // next = this->concatSteps(next, new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0));
+    // Step *extendEstop = useEStop
+    //                         ? new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION)
+    //                         : NULL;
+    // if (useEStop)
+    //     this->concatSteps(next, extendEstop);
+
+    // return positionEstop;
+
+    Step *positionEstop = new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION);
+    Step *next = this->concatSteps(positionEstop, new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0));
 
     return positionEstop;
-
-    // Step *next = new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0);
-
-    // return next;
 };
 
 Step *Task::receiveBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION direction)
