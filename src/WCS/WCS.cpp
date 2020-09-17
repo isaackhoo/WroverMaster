@@ -487,7 +487,10 @@ void WCS::perform(WcsComms input)
         {
         case MANUAL_SET_DEFAULT:
         {
-            // not in use
+            Status::setState(ENUM_SHUTTLE_STATE::IDLE);
+            Status::saveStatus();
+            manualSetLog += F("[Manual] State set to ");
+            manualSetLog += Status::getStateString();
             break;
         }
         case MANUAL_SET_ID:
