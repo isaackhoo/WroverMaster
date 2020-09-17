@@ -23,6 +23,14 @@ void setup()
       Logger::log("No status file found");
       // create default status folder
       Status::saveStatus();
+      Logger::log("Created Status folder");
+      Logger::log("Please set ID via SD card");
+    } else {
+      // check that id is not default id
+      if (Status::getId() == DEFAULT_ID) {
+        initializationRes = false;
+        Logger::logError("Please set shuttle ID");
+      }
     };
   }
 

@@ -18,6 +18,8 @@ namespace Logger
         res = SDCard::sdInit();
         if (res)
             LCD::display(F("SD initialized"));
+        else
+            LCD::display(F("SD faild to initialize"));
         return res;
     };
 

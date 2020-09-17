@@ -287,6 +287,7 @@ void WCS::runPing()
                 if (this->droppedPings < MAX_DROPPED_PINGS)
                 {
                     this->droppedPings += 1;
+                    Logger::logWcsError("dropped ping");
                 }
                 else
                 {
