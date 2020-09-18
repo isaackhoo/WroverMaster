@@ -362,10 +362,9 @@ Step *Task::moveTo(String slothole)
 
     // return positionEstop;
 
-    Step *positionEstop = new Step(ENGAGE_ESTOP, ESTOP_EXTEND, ESTOP_DEVIATION);
-    Step *next = this->concatSteps(positionEstop, new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0));
+    Step *next = new Step(MOVETO, slothole.toDouble(), CMP_DEFAULT, 0);
 
-    return positionEstop;
+    return next;
 };
 
 Step *Task::receiveBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION direction)
