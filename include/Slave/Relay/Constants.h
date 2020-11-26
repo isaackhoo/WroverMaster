@@ -1,0 +1,10 @@
+#pragma once
+
+#ifndef RELAY_CONSTANTS_H
+#define RELAY_CONSTANTS_H
+
+// Analog Pins
+#define TWELVE_VOLT_SLAVE_POWER_CTRL  26
+#define TWENTY_FOUR_VOLT_SLAVE_POWER_CTRL 27
+
+#endif

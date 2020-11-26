@@ -399,8 +399,14 @@ Step *Task::releaseBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
 
     // check that no bin exist at slot
     Step *init = new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction, this->getComparisonType(direction));
+    Step *next = NULL;
+    // if bin is to be stored in first depth, check if second depth exists
+    if (depth == FIRST_DEPTH)
+    {
+        next = this->concatSteps(init, new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(SECOND_DEPTH) * direction, this->getComparisonType(direction == LEFT ? RIGHT : LEFT)));
+    }
     // extend fingers and arm to release bin
-    Step *next = this->concatSteps(init, new Step(EXTEND_FINGER_PAIR, reverse * direction));
+    next = this->concatSteps(depth == FIRST_DEPTH ? next : init, new Step(EXTEND_FINGER_PAIR, reverse * direction));
     next = this->concatSteps(next, new Step(EXTEND_ARM, depth * direction, ARM_EXTENSION_TOLERANCE));
     // home arm
     next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));

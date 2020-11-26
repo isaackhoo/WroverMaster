@@ -4,9 +4,11 @@
 #include "WCS/WCS.h"
 #include "Slave/Slave.h"
 #include "ESPWrover/ESPWrover.h"
+#include "Slave/Reset/Reset.h"
 
 Slave slave;
 WCS wcs;
+Reset reset;
 
 void setup()
 {
@@ -47,6 +49,10 @@ void setup()
 
   if (initializationRes)
   {
+    Logger::log("Resetting Slave");
+    reset.resetSlave();
+    delay(2000);
+
     // init slave
     initializationRes = slave.init(&Serial);
     if (!initializationRes)
