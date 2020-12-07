@@ -49,9 +49,9 @@ void setup()
 
   if (initializationRes)
   {
-    Logger::log("Resetting Slave");
-    reset.resetSlave();
-    delay(2000);
+    // Logger::log("Resetting Slave");
+    // reset.resetSlave();
+    // delay(2000);
 
     // init slave
     initializationRes = slave.init(&Serial);

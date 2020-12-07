@@ -165,13 +165,18 @@ void WCS::loginToServer()
     this->send(loginMsg, false, false);
 };
 
+
 void WCS::notifyTaskCompletion(String feedback)
 {
     // set shuttle status idle
     Status::setState(IDLE);
 
+    delay(20);
+
     // update that task is complete
     this->completionNotification = new WcsComms((ENUM_WCS_ACTIONS)Status::getActionEnum().toInt(), feedback);
+
+    delay(20);
 
     // remove shuttle task
     Status::clearTask();

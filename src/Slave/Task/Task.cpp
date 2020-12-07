@@ -381,11 +381,12 @@ Step *Task::receiveBin(ENUM_EXTENSION_DEPTH depth, ENUM_EXTENSION_DIRECTION dire
     next = this->concatSteps(next, new Step(EXTEND_FINGER_PAIR, direction));
     // offset retrieval to prevent finger jam
     next = this->concatSteps(next, new Step(EXTEND_ARM, reverse * direction * OFFSET, ARM_EXTENSION_TOLERANCE));
-    // home arm
-    next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
-    next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, direction));
     // check that bin slot is now empty - bin has been successfully retrieved
     next = this->concatSteps(next, new Step(READ_BIN_SENSOR, this->determineEmptyBinSlotSensing(depth) * direction, this->getComparisonType(direction)));
+    // home arm
+    next = this->concatSteps(next, new Step(HOME_ARM, HOME_DEPTH, ARM_EXTENSION_TOLERANCE));
+    // retract fingers
+    next = this->concatSteps(next, new Step(RETRACT_FINGER_PAIR, direction));
 
     return init;
 };
