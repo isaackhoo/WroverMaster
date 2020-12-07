@@ -158,6 +158,10 @@ bool Task::createStorageTask(String storageInst)
         this->appendToList(this->releaseBin(storageInterpretor.getDepth(), storageInterpretor.getDirection()));
     }
 
+    // TODO
+    // check SD for same command and sane inst
+    // - if matches -> tag in taskmanager current completed steps. / defaults to 0
+
     return res;
 };
 
@@ -177,6 +181,10 @@ bool Task::createRetrievalTask(String retrievalInst)
         this->appendToList(this->moveTo(String(SLOTHOLE_BUFFER)));
         this->appendToList(this->releaseBin(BUFFER_DEPTH, RIGHT));
     };
+
+    // TODO
+    // check SD for same command and sane inst
+    // - if matches -> tag in taskmanager current completed steps. / defaults to 0
 
     return res;
 };

@@ -626,5 +626,9 @@ void Slave::runPing()
 
 void Slave::startTask()
 {
+    // check taskmaster for current steps completed.
+    // if not 0, shift steps.
+    // if 0, cont as usual
+
     this->send(this->taskManager.begin());
 };
